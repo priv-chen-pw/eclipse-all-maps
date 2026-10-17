@@ -1,7 +1,7 @@
 {
   "name": "EclipseAllMaps",
-  "version_number": "1.1.0",
-  "website_url": "",
+  "version_number": "1.1.1",
+  "website_url": "https://github.com/priv-chen-pw/eclipse-all-maps",
   "description": "Adds Reformed Altar, Treeborn Colony, Conduit Canyon and Void Locus to the Eclipse stage rotation, balanced for their stage, and closes portals that lead off it. Every change can be switched off in Mod Options.",
   "dependencies": [
     "bbepis-BepInExPack-5.4.2122",

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+* The Thunderstore page links to the GitHub repository.
+
 ## 1.1.0
 
 * **Conduit Canyon:** its teleporter boss is a Solus Control Unit, Alloy Worship Unit, Solus Amalgamator or Alloy Hunter, equally likely. New setting: Robot bosses.
