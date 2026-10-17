@@ -2,12 +2,12 @@
 
 More variety for your Eclipse climb. Made mostly for no-loop Eclipse runs: the maps you normally only reach through a special portal join the normal stage rotation.
 
-| Stage | Added map |
-| --- | --- |
-| 2 | Reformed Altar |
-| 3 | Treeborn Colony |
-| 4 | Conduit Canyon |
-| 5 | Void Locus |
+| Stage | Added map | Preview |
+| --- | --- | --- |
+| 2 | Reformed Altar | ![Reformed Altar](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/reformed-altar.jpg) |
+| 3 | Treeborn Colony | ![Treeborn Colony](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/treeborn-colony.jpg) |
+| 4 | Conduit Canyon | ![Conduit Canyon](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/conduit-canyon.jpg) |
+| 5 | Void Locus | ![Void Locus](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/void-locus.jpg) |
 
 Each one plays like the other maps on its stage: about as many chests and monsters, and a normal teleporter on to the next stage. Void Locus leads to Mithrix, like Sky Meadow.
 
@@ -66,3 +66,7 @@ Each added map needs its DLC to be on for the run: Reformed Altar and Treeborn C
 ### Multiplayer
 
 Only the host needs the mod, and only the host's settings count.
+
+### Credits
+
+Map images from the [Risk of Rain 2 Wiki](https://riskofrain2.wiki.gg/).
