@@ -27,7 +27,9 @@ and Risk Of Options installed through r2modman.
 
 `dotnet build EclipseAllMaps.sln -c Release` also writes `artifacts/EclipseAllMaps-<version>.zip`, the
 Thunderstore package. It fails if `Version` in the csproj, `version_number` in the manifest and
-`PluginVersion` in the code disagree. `Thunderstore/icon.png` is a placeholder.
+`PluginVersion` in the code disagree. `Thunderstore/icon.png` (256×256) is the four added maps in a 2×2
+grid, stages 2-5 in reading order, cropped from the Risk of Rain 2 Wiki's 480×288 screenshots, under an
+eclipse ring.
 
 ## How stages are picked
 
