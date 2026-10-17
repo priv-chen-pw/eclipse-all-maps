@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+* Halcyon Shrines can spawn on every stage like any other interactable, with their usual cost and odds, and no longer open a green portal. New setting: Halcyon Shrine on every stage.
+* One setting, Alloy Hunter as a normal boss, now covers both the Alloy Hunter in stage 4+ boss pools and the single boss on Conduit Canyon. Off, the Alloy Hunter is Conduit Canyon's second boss again, as in vanilla. It replaces the Conduit Canyon "One boss" setting.
+* The README lists each added map's changes and shows the Halcyon Shrine, the frog and the Alloy Hunter.
+
 ## 1.0.1
 
 * New icon: the four added maps under an eclipse.

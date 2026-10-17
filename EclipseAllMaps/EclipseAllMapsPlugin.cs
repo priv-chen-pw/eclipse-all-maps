@@ -15,7 +15,7 @@ namespace EclipseAllMaps
         public const string PluginAuthor = "chen-ror2";
         public const string PluginName = "EclipseAllMaps";
         public const string PluginGuid = PluginAuthor + "." + PluginName;
-        public const string PluginVersion = "1.0.1";
+        public const string PluginVersion = "1.0.2";
 
         public void Awake()
         {
@@ -29,6 +29,7 @@ namespace EclipseAllMaps
             AddedMapMonsters.Init();
             AddedMapInteractables.Init();
             AlloyHunterBoss.Init();
+            HalcyonShrines.Init();
 
             if (RiskOfOptionsCompat.IsInstalled)
             {

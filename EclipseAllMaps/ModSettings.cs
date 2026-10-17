@@ -21,10 +21,10 @@ namespace EclipseAllMaps
         internal static ConfigEntry<bool> VoidLocusInteractables;
 
         internal static ConfigEntry<bool> ConduitCanyonToStage5;
-        internal static ConfigEntry<bool> ConduitCanyonOneBoss;
 
         internal static ConfigEntry<bool> NoColossusPortals;
         internal static ConfigEntry<bool> FrogPortalToPrimeMeridian;
+        internal static ConfigEntry<bool> HalcyonShrineEveryStage;
 
         internal static ConfigEntry<bool> AlloyHunterBoss;
 
@@ -60,16 +60,17 @@ namespace EclipseAllMaps
 
             ConduitCanyonToStage5 = Bind(config, "Conduit Canyon", "TeleporterToStageFive", "Teleporter to stage 5", true,
                 "Conduit Canyon's teleporter leads to stage 5. Off, it leads down the Alloyed path to Solutional Haunt, as in vanilla.");
-            ConduitCanyonOneBoss = Bind(config, "Conduit Canyon", "OneBoss", "One boss", true,
-                "Conduit Canyon's teleporter event has one boss, a Solus Amalgamator or an Alloy Hunter. Off, it has vanilla's scripted fight: a Solus Control Unit that the Alloy Hunter kills and replaces.");
 
             NoColossusPortals = Bind(config, "Colossus Path", "NoGreenPortals", "No green portals", true,
-                "Reformed Altar and Treeborn Colony open no green portal down the Colossus path, so the run stays on the stage rotation. Off, they open one as in vanilla.");
+                "Reformed Altar's and Treeborn Colony's teleporters and Halcyon Shrines open no green portal down the Colossus path, so the run stays on the stage rotation. Off, they open them as in vanilla.");
             FrogPortalToPrimeMeridian = Bind(config, "Colossus Path", "FrogPortalToPrimeMeridian", "Frog portal to Prime Meridian", true,
                 "After Mithrix, petting Commencement's frog 10 times also opens a green portal to Prime Meridian (False Son), next to the void one.");
+            HalcyonShrineEveryStage = Bind(config, "Colossus Path", "HalcyonShrineEveryStage", "Halcyon Shrine on every stage", true,
+                "Halcyon Shrines can spawn on every stage, as one of its interactables with their usual cost and odds. Vanilla only has them when a stage's Seekers of the Storm content is rolled in, and never on Conduit Canyon or Void Locus. Needs Seekers of the Storm.");
 
-            AlloyHunterBoss = Bind(config, "Bosses", "AlloyHunterFromStageFour", "Alloy Hunter from stage 4", true,
-                "From stage 4 on, the Alloy Hunter can be the teleporter boss on any map, as likely as any one of that map's own bosses. Needs the Alloyed Collective DLC.");
+            // Key kept from when it only covered stage 4+, so existing configs keep their choice.
+            AlloyHunterBoss = Bind(config, "Bosses", "AlloyHunterFromStageFour", "Alloy Hunter as a normal boss", true,
+                "The Alloy Hunter becomes a normal boss: from stage 4 on it can be the teleporter boss on any map, as likely as any one of that map's own bosses, and Conduit Canyon's teleporter event has one boss. Off, it only shows up as vanilla's second boss on Conduit Canyon, killing and replacing a Solus Control Unit. Needs the Alloyed Collective DLC.");
 
             OnlyAddedMaps = Bind(config, "Debug", "OnlyAddedMaps", "Only added maps", false,
                 "Gives every other map a 0% chance on the stages that gained a map, and keeps them off the Bazaar's Lunar Seers, so an Eclipse run with every map switched on always goes stage 1 -> Reformed Altar -> Treeborn Colony -> Conduit Canyon -> Void Locus -> Commencement. For testing the added maps; leave off for normal play.");

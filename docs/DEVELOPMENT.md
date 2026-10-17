@@ -149,7 +149,24 @@ at `EscapeSequenceObjects/FrogSpawner` once Mithrix falls, and its `FrogControll
 `iscDeepVoidPortal` (Planetarium) on the 10th pet (`maxPets`). Hooking `FrogController.Pet`, the 10th
 pet also spawns `iscColossusPortal` within 10-40 m of the frog, pinned to `destinationScene = meridian`
 (it would land there anyway: from stageOrder 6 no tier matches and it falls back to `destinationScene`).
-Not without DLC2, nor once False Son is beaten. After False Son, Prime Meridian's Shrine of Rebirth
+Not without DLC2, nor once False Son is beaten.
+
+The Halcyon Shrine (`ShrineHalcyonite`, `HalcyoniteShrineInteractable`) carries `PortalSpawner`s fired by
+`AttemptSpawnPortal` when its gold is in: `iscColossusPortal` on stage tiers 1-3 except the SotS maps
+(banned by `StormPortalTaken`), and `iscGoldshoresPortal` on tiers 4-5, on the SotS maps' tiers 1-3, or
+after the path was taken. The same `PortalSpawner.Start` hook closes its green one on any map (No green
+portals). Vanilla lists it under "Storm Stuff" in every stage 1-5 map's DLC2 interactable list (Conduit
+Canyon and Void Locus have none): stage 1 maps `iscShrineHalcyoniteTier1` (40 credits, weight 7,
+category 3; Disturbed Impact 15 / 9), later maps `iscShrineHalcyonite` (50 credits, weight 1, category
+1.5; Reformed Altar and Helminth Hatchery 10), max 1 per stage. That DLC2 list only joins when the
+blender rolls it within `contentInteractableSourceMixLimit`, so many stages lack it.
+[HalcyonShrines.cs](../EclipseAllMaps/HalcyonShrines.cs) subscribes to
+`SceneDirector.onGenerateInteractableCardSelection` (called with a copy of the stage's
+`interactableCategories` right before the roll) and, when no Halcyon card is in it, adds the stage's one
+with those weights to "Storm Stuff" (creating the category if needed). Needs DLC2
+(`DirectorCard.IsAvailable`).
+
+After False Son, Prime Meridian's Shrine of Rebirth
 offers the Rebirth ending (`RebirthEndingDef`, `isWin` 1, so it counts for Eclipse) or a portal on to
 Helminth Hatchery; `PM DestinationPortal` goes to `Run.nextStageScene`.
 
@@ -159,7 +176,9 @@ Conduit Canyon's teleporter has a `VultureFightOverride` (`triggerOnStart`): it 
 boss to a Solus Control Unit (`ForcedBossFight` = `cscRoboBallBoss`, singular, scaled), and at 75% health
 summons `VultureHunterMaster`, the Alloy Hunter, which kills it and takes its place. Its own boss deck
 (`dccsConduitcanyonBosses`: Solus Amalgamator) never gets used. [AlloyHunterBoss.cs](../EclipseAllMaps/AlloyHunterBoss.cs)
-clears `triggerOnStart` on Conduit Canyon in play, so that deck picks one boss. From stage 4
+clears `triggerOnStart` on Conduit Canyon in play, so that deck picks one boss. Both this and the pool
+entry below hang on one setting (Bosses / `AlloyHunterFromStageFour`, the key kept from when it only
+meant the pool), so turning it off gives the Alloy Hunter back its vanilla place. From stage 4
 (`stageClearCount` >= 3) on any map, `CombatDirector.SetNextSpawnAsBoss` on the teleporter's boss
 director first rolls the Alloy Hunter (`RoR2/DLC3/VultureHunter/cscVultureHunter.asset`: 800 credits, air,
 allowed as boss) at 1 in (bosses + 1), counting bosses as vanilla does (available champions not

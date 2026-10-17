@@ -48,7 +48,7 @@ namespace EclipseAllMaps
             new StageMap(4, "repurposedcrater", "Repurposed Crater"),
             new StageMap(4, "sanctum", "Lurid Basilica"),
             new StageMap(4, "conduitcanyon", "Conduit Canyon",
-                " Added by this mod. Its teleporter leads to stage 5 instead of the Alloyed path, with one boss."),
+                " Added by this mod. Its teleporter leads to stage 5 instead of the Alloyed path."),
 
             new StageMap(5, "skymeadow", "Sky Meadow"),
             new StageMap(5, "helminthroost", "Helminth Hatchery"),

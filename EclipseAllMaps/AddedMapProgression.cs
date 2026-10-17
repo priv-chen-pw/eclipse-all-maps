@@ -17,11 +17,13 @@ namespace EclipseAllMaps
     /// - Reformed Altar and Treeborn Colony (Golden Dieback) open no green Colossus portal. Every teleporter
     ///   carries one for those maps (100%), leading on down the Colossus path to the next of them and Prime
     ///   Meridian, which would take the run off the stage rotation.
+    /// - Nor does a Halcyon Shrine, on any map: once its gold is in, it opens one on stages 1-3 of the other
+    ///   maps. Its gold portal (Gilded Coast) stays.
     ///
-    /// Each has its own setting, and applies only where the mod does and that map is switched on. The
-    /// Colossus path's end, Prime Meridian and
-    /// False Son, stays reachable the way the Planetarium is: petting Commencement's frog 10 times after
-    /// Mithrix opens a green portal there next to the void one.
+    /// Each has its own setting, and applies only where the mod does and (for an added map) that map is
+    /// switched on. The Colossus path's end, Prime Meridian and False Son, stays reachable the way the
+    /// Planetarium is: petting Commencement's frog 10 times after Mithrix opens a green portal there next to
+    /// the void one.
     /// </summary>
     internal static class AddedMapProgression
     {
@@ -98,10 +100,11 @@ namespace EclipseAllMaps
             // Start rolls the portal against spawnChance, and turns on its preview orb if it will spawn.
             On.RoR2.PortalSpawner.Start += (orig, self) =>
             {
-                if (NetworkServer.active && self.portalSpawnCard && self.portalSpawnCard.name == ColossusPortalCard && ModSettings.NoColossusPortals.Value && AddedMaps.InPlay() != null)
+                if (NetworkServer.active && self.portalSpawnCard && self.portalSpawnCard.name == ColossusPortalCard
+                    && ModSettings.NoColossusPortals.Value && IsClosedColossusPortal(self, out string source))
                 {
                     self.spawnChance = -1f;
-                    Log.Info($"{SceneCatalog.mostRecentSceneDef.cachedName}: no green Colossus portal.");
+                    Log.Info($"{SceneCatalog.mostRecentSceneDef.cachedName}: no green Colossus portal from the {source}.");
                 }
 
                 orig(self);
@@ -160,6 +163,22 @@ namespace EclipseAllMaps
 
             Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = "PORTAL_STORM_OPEN" });
             Log.Info("Commencement: the frog opened a portal to Prime Meridian.");
+        }
+
+        /// <summary>
+        /// Whether a green Colossus portal spawner is one this mod closes: a Halcyon Shrine's (stages 1-3 of
+        /// other maps, once its gold is in) anywhere the mod is on, or the teleporter's on an added map.
+        /// </summary>
+        private static bool IsClosedColossusPortal(PortalSpawner spawner, out string source)
+        {
+            if (spawner.GetComponentInParent<HalcyoniteShrineInteractable>())
+            {
+                source = "Halcyon Shrine";
+                return EclipseStagePool.IsActive(Run.instance);
+            }
+
+            source = "teleporter";
+            return AddedMaps.InPlay() != null;
         }
 
         /// <summary>

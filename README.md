@@ -2,14 +2,14 @@
 
 More variety for your Eclipse climb. Made mostly for no-loop Eclipse runs: the maps you normally only reach through a special portal join the normal stage rotation.
 
-| Stage | Added map | Preview |
-| --- | --- | --- |
-| 2 | Reformed Altar | ![Reformed Altar](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/reformed-altar.jpg) |
-| 3 | Treeborn Colony | ![Treeborn Colony](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/treeborn-colony.jpg) |
-| 4 | Conduit Canyon | ![Conduit Canyon](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/conduit-canyon.jpg) |
-| 5 | Void Locus | ![Void Locus](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/void-locus.jpg) |
+| Stage | Added map | Preview | Changes |
+| --- | --- | --- | --- |
+| 2 | Reformed Altar | ![Reformed Altar](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/reformed-altar.jpg) | • Stage 2 chest and monster credits<br>• No green portal down the Colossus path |
+| 3 | Treeborn Colony | ![Treeborn Colony](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/treeborn-colony.jpg) | • No green portal down the Colossus path<br>• Golden Dieback after looping |
+| 4 | Conduit Canyon | ![Conduit Canyon](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/conduit-canyon.jpg) | • Teleporter leads to stage 5, not the Alloyed path<br>• One boss: Solus Amalgamator or Alloy Hunter<br>• Stage 4 monster credits |
+| 5 | Void Locus | ![Void Locus](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/void-locus.jpg) | • Primordial Teleporter to Mithrix instead of Deep Void Signals (no void fog)<br>• Stage 5 chests, shrines, printers and drones<br>• Stage 5 monsters on the first loop<br>• Stage 5 chest credits (220 → 545) |
 
-Each one plays like the other maps on its stage: about as many chests and monsters, and a normal teleporter on to the next stage. Void Locus leads to Mithrix, like Sky Meadow.
+Each one plays like the other maps on its stage.
 
 Everything is optional. Switch single maps or single changes on and off in game under **Settings → Mod Options**. Only the host needs the mod.
 
@@ -24,15 +24,23 @@ Everything is optional. Switch single maps or single changes on and off in game 
   * Its interactables are a stage 5's (chests, shrines, printers, drones), with its own Void Cradles, Void Potentials and Stalks about as common as chests.
   * On the first loop its monsters are toned down to stage 5: half Sky Meadow's, half its own Void Devastators, Void Reavers and Void Barnacles. Void Jailers and its full void lineup come back after a loop, the earliest vanilla lets you reach it.
 
-Damp Caverns and Tenebrous Quagmire are already part of the normal stage 3 rotation, so they need no change.
+### Halcyon Shrine
+
+![Halcyon Shrine](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/halcyon-shrine.jpg)
+
+The Halcyon Shrine, the pillar you fill with gold for better rewards, can spawn on every stage like any other interactable, with its usual cost and odds. In vanilla it only shows up when a stage happens to roll in its Seekers of the Storm content, and never on Conduit Canyon or Void Locus. It no longer opens a green portal; its gold portal to Gilded Coast on later stages stays.
 
 ### Prime Meridian and False Son
+
+![The frog on Commencement](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/frog.jpg)
 
 With the green portals gone, the Colossus path's end is found the way the Planetarium is: after Mithrix, pet the frog on Commencement 10 times. Next to the purple portal to Voidling, a green one to Prime Meridian opens. Beat False Son there and choose Rebirth to win the run; it counts for Eclipse.
 
 ### Alloy Hunter
 
-From stage 4 on, the teleporter boss on any map can be the Alloy Hunter, Conduit Canyon's boss, as likely as any one of that map's own bosses. It is about as tough as a Solus Amalgamator.
+![Alloy Hunter](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/alloy-hunter.jpg)
+
+Conduit Canyon's boss becomes a normal boss. From stage 4 on, the teleporter boss on any map can be the Alloy Hunter, as likely as any one of that map's own bosses, and on Conduit Canyon you fight one boss instead of a Solus Control Unit that the Alloy Hunter kills and replaces halfway. It is about as tough as a Solus Amalgamator. Prefer vanilla? Switch off **Alloy Hunter as a normal boss** and it goes back to being Conduit Canyon's second boss only.
 
 ### Settings
 
@@ -50,18 +58,18 @@ In game under **Settings → Mod Options**, or in r2modman's **Config editor**. 
   * **Stage 5 interactables**: Sky Meadow's interactables alongside its void ones.
 * **Conduit Canyon**
   * **Teleporter to stage 5**: off, it leads down the Alloyed path as in vanilla.
-  * **One boss**: off, vanilla's Solus Control Unit that the Alloy Hunter kills and replaces.
 * **Colossus Path**
-  * **No green portals**: on Reformed Altar and Treeborn Colony.
+  * **No green portals**: from Reformed Altar's and Treeborn Colony's teleporters and from Halcyon Shrines.
   * **Frog portal to Prime Meridian**: the extra portal after Mithrix.
+  * **Halcyon Shrine on every stage**: off, it only shows up when vanilla rolls it in.
 * **Bosses**
-  * **Alloy Hunter from stage 4**: the Alloy Hunter in every map's boss pool from stage 4 on.
+  * **Alloy Hunter as a normal boss**: in every map's boss pool from stage 4 on, and Conduit Canyon has one boss. Off, it is only Conduit Canyon's second boss, as in vanilla.
 * **Debug**
   * **Only added maps** (off): the added maps become the only choice on their stages, and the Lunar Seers stop offering the others, so a run goes stage 1 → Reformed Altar → Treeborn Colony → Conduit Canyon → Void Locus → Commencement. For testing.
 
 ### DLC
 
-Each added map needs its DLC to be on for the run: Reformed Altar and Treeborn Colony need Seekers of the Storm, Conduit Canyon needs Alloyed Collective, and Void Locus needs Survivors of the Void. A map whose DLC is off simply isn't added. The Alloy Hunter needs Alloyed Collective, and the Prime Meridian portal Seekers of the Storm.
+Each added map needs its DLC to be on for the run: Reformed Altar and Treeborn Colony need Seekers of the Storm, Conduit Canyon needs Alloyed Collective, and Void Locus needs Survivors of the Void. A map whose DLC is off simply isn't added. The Alloy Hunter needs Alloyed Collective, and the Prime Meridian portal and Halcyon Shrine Seekers of the Storm.
 
 ### Multiplayer
 
@@ -69,4 +77,4 @@ Only the host needs the mod, and only the host's settings count.
 
 ### Credits
 
-Map images from the [Risk of Rain 2 Wiki](https://riskofrain2.wiki.gg/).
+Images from the [Risk of Rain 2 Wiki](https://riskofrain2.wiki.gg/).

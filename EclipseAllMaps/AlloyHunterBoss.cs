@@ -9,7 +9,8 @@ namespace EclipseAllMaps
     /// Solus Control Unit, and at 75% health an Alloy Hunter kills it and takes over, so the stage has two
     /// boss fights. Here the script is off, so Conduit Canyon has one boss like any stage, and the Alloy
     /// Hunter joins the boss pool of every teleporter from stage 4 on instead, as likely as any one of the
-    /// stage's own bosses.
+    /// stage's own bosses. One setting covers both, so turning it off gives the Alloy Hunter its vanilla
+    /// place back.
     /// </summary>
     internal static class AlloyHunterBoss
     {
@@ -25,7 +26,7 @@ namespace EclipseAllMaps
         {
             On.RoR2.VultureFightOverride.Start += (orig, self) =>
             {
-                if (NetworkServer.active && ModSettings.ConduitCanyonOneBoss.Value && AddedMaps.InPlay()?.SceneName == ConduitCanyon)
+                if (NetworkServer.active && ModSettings.AlloyHunterBoss.Value && AddedMaps.InPlay()?.SceneName == ConduitCanyon)
                 {
                     self.triggerOnStart = false;
                     Log.Info("Conduit Canyon: no scripted Solus Control Unit and Alloy Hunter fight.");
