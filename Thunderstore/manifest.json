@@ -1,0 +1,11 @@
+{
+  "name": "EclipseAllMaps",
+  "version_number": "1.0.0",
+  "website_url": "",
+  "description": "More variety for Eclipse climbs: Reformed Altar, Treeborn Colony, Conduit Canyon and Void Locus join the normal stage rotation, balanced for their stage. Every map and change can be switched on or off in Mod Options.",
+  "dependencies": [
+    "bbepis-BepInExPack-5.4.2122",
+    "RiskofThunder-HookGenPatcher-1.2.9",
+    "Rune580-Risk_Of_Options-2.8.6"
+  ]
+}

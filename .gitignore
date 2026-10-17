@@ -1,0 +1,19 @@
+# Build output (the Thunderstore zip goes to artifacts/)
+bin/
+obj/
+artifacts/
+
+# IDE and editor settings
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# OS files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Personal Claude Code settings
+.claude/settings.local.json
