@@ -76,7 +76,7 @@ Details worth knowing:
 - **Settings.** All bound in [ModSettings.cs](../EclipseAllMaps/ModSettings.cs), which also holds the Risk
   Of Options labels and menu order (a checkbox per bool; `AddedMapChance` is a 0.1-5 step slider from its
   `AcceptableValueRange`). Sections: General (`AddAllMapsToEclipse`, `AlsoInNormalRuns`, `AddedMapChance`,
-  `BalanceCredits`), Stage 1-5, Void Locus, Conduit Canyon, Colossus Path, Bosses, Debug. Each feature
+  `BalanceCredits`), Stage 1-5, Void Locus, Conduit Canyon, Colossus Path, Alloyed Path, Bosses, Debug. Each feature
   class checks its own entry next to `EclipseStagePool.IsActive` / `AddedMaps.InPlay`, which go through
   `ModSettings.AppliesTo`: an `EclipseRun`, or with `AlsoInNormalRuns` a plain `Run` (the classic mode;
   Simulacrum and Prismatic Trials are subclasses and never count). `AddAllMapsToEclipse` switches the mod. Every map in the vanilla pools plus
@@ -129,84 +129,188 @@ Details worth knowing:
   empties `seerSceneOverrides` (the Bazaar's chance-based extra seer scenes). Seers then show an added
   map, or are disabled as in vanilla when none qualifies (Conduit Canyon is filtered out of the
   Bazaar anyway).
-- **Other exits.** The Bazaar, Gilded Coast and other hidden realms return to `Run.nextStageScene`,
-  so they keep the pick. The green Colossus-path portal (`PortalColossus`, `iscColossusPortal`) is an
-  `isAlternatePath` exit with tier destinations lemuriantemple / habitat / meridian; see Colossus path
-  below for where it still opens.
+- **Other exits.** The Bazaar, Gilded Coast, Computational Exchange and other hidden realms return to
+  `Run.nextStageScene`, so they keep the pick. The portals down the two DLC paths are closed; see
+  Colossus path and Alloyed path below.
+- **`run_scene_override`** (cheat convar) keeps forcing the first stage.
+- **Multiplayer.** Picking is server-only and clients load the scene by name, so only the host needs the
+  mod. Every hook acts on the server only. No `NetworkCompatibility` is declared.
 
 ## Colossus path
 
 Every vanilla teleporter (`Teleporter1`, `LunarTeleporter Variant`) has a `PortalSpawner` for
 `iscColossusPortal` with `spawnChance` 1 and `validStages` habitat, lemuriantemple, habitatfall (banned by
-`FalseSonBossComplete`), so Reformed Altar and Treeborn Colony always open it, leading to the next path
-map and then Prime Meridian. Gilded Coast's exit and the Bazaar's geode listener can open one too (its
-tier destination follows the next stage's number); those are left alone.
+`FalseSonBossComplete`), so Reformed Altar and Treeborn Colony always open it. The portal
+(`PortalColossus`) is an `isAlternatePath` exit whose destination follows the next stage's number: tier 2
+lemuriantemple, 3 habitat, 4 meridian, otherwise its own `destinationScene` (meridian). The other sources,
+from a scan of every scene:
 
-[AddedMapProgression.cs](../EclipseAllMaps/AddedMapProgression.cs) sets that spawner's `spawnChance` to
--1 before its `Start` (which rolls it and lights the preview orb) on the added maps in play. To keep
-Prime Meridian reachable it mirrors the void route: Commencement (`moon2`) spawns `FrogInteractable`
-at `EscapeSequenceObjects/FrogSpawner` once Mithrix falls, and its `FrogController` opens an
-`iscDeepVoidPortal` (Planetarium) on the 10th pet (`maxPets`). Hooking `FrogController.Pet`, the 10th
-pet also spawns `iscColossusPortal` within 10-40 m of the frog, pinned to `destinationScene = meridian`
-(it would land there anyway: from stageOrder 6 no tier matches and it falls back to `destinationScene`).
-Not without DLC2, nor once False Son is beaten.
+- the Halcyon Shrine's own spawner (below);
+- the Bazaar's `Mini Geodes/Geode Listener`, fired by `MiniGeodeTracker.Listening` once three geodes break
+  (banned by `StormPortalTaken`);
+- Gilded Coast's `EntityStates.Missions.Goldshores.Exit`, which spawns `iscColossusPortal` itself next to
+  the gold exit when its private `IsValidStormTier` holds (DLC2, next stage on tier 2-4);
+- Solutional Haunt's treasure-room teleporter, which carries the teleporter spawner but is never on a
+  valid stage.
+
+[AlternatePathPortals.cs](../EclipseAllMaps/AlternatePathPortals.cs) (Colossus Path / No green portals)
+sets a Colossus spawner's `spawnChance` to -1 before `PortalSpawner.Start` (which rolls it and lights the
+preview orb): a teleporter's only on the added maps in play, any other wherever the mod is on. Hooking
+`Exit.IsValidStormTier` to return false closes Gilded Coast's.
+
+To keep the paths' endings reachable the mod mirrors the void route. Commencement (`moon2`) spawns
+`FrogInteractable` at `EscapeSequenceObjects/FrogSpawner` once Mithrix falls, and `FrogController.Pet`
+fires its `PortalSpawner` (`iscDeepVoidPortal`, the Planetarium) once `petCount >= maxPets` (10). On the
+pet that reaches it (`petCount == maxPets`, so once) the mod also spawns, 10-40 m from the frog:
+
+- `iscColossusPortal` pinned to `destinationScene = meridian` (it would land there anyway: from stageOrder
+  6 no tier matches). Not without DLC2, nor once False Son is beaten. After False Son, Prime Meridian's
+  Shrine of Rebirth offers the Rebirth ending (`RebirthEndingDef`, `isWin` 1, so it counts for Eclipse)
+  or a portal on to Helminth Hatchery; `PM DestinationPortal` goes to `Run.nextStageScene`.
+- Neural Sanctum's portal; see Alloyed path.
+
+## Halcyon Shrine
 
 The Halcyon Shrine (`ShrineHalcyonite`, `HalcyoniteShrineInteractable`) carries `PortalSpawner`s fired by
 `AttemptSpawnPortal` when its gold is in: `iscColossusPortal` on stage tiers 1-3 except the SotS maps
 (banned by `StormPortalTaken`), and `iscGoldshoresPortal` on tiers 4-5, on the SotS maps' tiers 1-3, or
-after the path was taken. The same `PortalSpawner.Start` hook closes its green one on any map (No green
-portals). Vanilla lists it under "Storm Stuff" in every stage 1-5 map's DLC2 interactable list (Conduit
-Canyon and Void Locus have none): stage 1 maps `iscShrineHalcyoniteTier1` (40 credits, weight 7,
-category 3; Disturbed Impact 15 / 9), later maps `iscShrineHalcyonite` (50 credits, weight 1, category
-1.5; Reformed Altar and Helminth Hatchery 10), max 1 per stage. That DLC2 list only joins when the
-blender rolls it within `contentInteractableSourceMixLimit`, so many stages lack it.
+after the path was taken. The green one is closed with the others above. Vanilla lists the shrine under
+"Storm Stuff" in every stage 1-5 map's DLC2 interactable list (Conduit Canyon and Void Locus have none):
+stage 1 maps `iscShrineHalcyoniteTier1` (40 credits, weight 7, category 3; Disturbed Impact 15 / 9), later
+maps `iscShrineHalcyonite` (50 credits, weight 1, category 1.5; Reformed Altar and Helminth Hatchery 10),
+max 1 per stage. That DLC2 list only joins when the blender rolls it within
+`contentInteractableSourceMixLimit`, so many stages lack it.
 [HalcyonShrines.cs](../EclipseAllMaps/HalcyonShrines.cs) subscribes to
 `SceneDirector.onGenerateInteractableCardSelection` (called with a copy of the stage's
 `interactableCategories` right before the roll) and, when no Halcyon card is in it, adds the stage's one
 with those weights to "Storm Stuff" (creating the category if needed). Needs DLC2
 (`DirectorCard.IsAvailable`).
 
-After False Son, Prime Meridian's Shrine of Rebirth
-offers the Rebirth ending (`RebirthEndingDef`, `isWin` 1, so it counts for Eclipse) or a portal on to
-Helminth Hatchery; `PM DestinationPortal` goes to `Run.nextStageScene`.
+Its fight, from the prefab:
 
-## Alloy Hunter
+- Gold: 75 / 150 / 300 for the three tiers, through `Run.GetDifficultyScaledCost` (× difficulty^1.25, like
+  chest prices), set in `Awake`.
+- Monster waves: entering the no, low and mid quality states (`tierChangeMonsterCreditReduction` 0) each
+  spends `monsterCredit` (140 × `difficultyCoefficient`, set in `Awake`) through `SpendAllCreditsOnMapSpawns`
+  on its "ActivationWave" director: `dccsShrineHalcyoniteActivationMonsterWave` (Stone Golem, 40 credits),
+  `eliteBias` 2.5, so elite golems (240 each) only while 600+ credits are left, 0.6 gold.
+- Halcyonite: at max quality `DrainConditionMet` calls `CombatDirector.HalcyoniteShrineActivation` on its
+  "Halcyonite" director with `cscHalcyonite` (200 credits) and level `goldDrained / 100`. The spawn
+  (`isHalcyonShrineSpawn`) gets BoostHp for +60% health and BoostDamage for +25% damage per level (above 15
+  the level becomes 15 + level / 200, so 15 in practice) and the Aurelionite affix; no elite tier (its ×6
+  elite cost never fits the 200 credits).
+- Reward: one item per player, a choice of 3 from `dtShrineHalcyoniteTier3` (white 0.65, green 0.3, red
+  0.05), plus the portal.
+
+Since the gold already scales with difficulty, the level cap is reached from stage 3 (full is about 1770
+gold at difficulty 4): ×10 health and ×4.75 damage on top of its level, for the same reward as on stage 1
+(level 3: ×2.8 / ×1.75). Solo in Eclipse at stage 4, 20 minutes (difficulty 6.1, monster level 16): each
+wave is 860 credits, two elite and nine normal Stone Golems; the Halcyonite has about 49,500 health,
+against 15,400 for an Imp Overlord. With Colossus Path / Weaker Halcyon Shrines from stage 4
+(`stageClearCount` >= 3) the shrine's `monsterCredit` is halved after `Awake` (430: ten normal golems a
+wave) and `HalcyoniteShrineActivation` gets min(level, 15) / 2, at most 7: ×5.2 health (about 25,700)
+and ×2.75 damage.
+
+## Alloyed path
+
+The Alloyed Collective's path is Conduit Canyon (stage 4) → Solutional Haunt (`solutionalhaunt`, Solus
+Wing; its treasure room's Primordial Teleporter exits to `moon2`) → Commencement. Its ending is Solus
+Heart in Neural Sanctum (`solusweb`, "Hidden Realm: Neural Sanctum"), which vanilla reaches from
+Computational Exchange: handing the Solus vendor a Master Core (`SolusVendorShrineController.HandleGivenItem`)
+runs `SolusWebPortalSequence` and spawns `SolusWebPortal`. Accepting Solus Heart's offering
+(`SolusHeartFinaleSequence.OfferingAccepted`) ends the run with `DecompileEnding` (`isWin` 1); killing it
+opens an exit to `Run.nextStageScene` (and, outside Eclipse, a void portal). `SolusWebMissionController`
+needs nothing from the quest (only the `NoSolusHeartOffer` flag, which nothing sets, skips the offering),
+and the scene has no event-flag responses.
+
+Its portals off the rotation come from the access codes. `AccessCodesMissionController` (on Pretender's
+Precipice, Iron Alluvium / Iron Auroras and Repurposed Crater, and in the "Access Codes Portals" prefab)
+places code nodes on points of interest; solved in order while the teleporter is idle, they fire
+`SolusFight.TriggerServer`. That forces a companion boss (`cscSolusAmalgamator` on `companionBoss`), adds
+a boss reward (`TeleporterInteraction.ActivateAccessCodes`), and arms one of three `PortalSpawner`s
+(`spawnChance` 0, `registerSelfToPortalRemotelyOnActivation`), lighting the teleporter's
+`CEPortalIndicator`:
+
+- `iscSolusShopPortal` (Computational Exchange) after `SolusWingBeaten`;
+- else `iscHardwareProgPortal` (Conduit Canyon) when `stageClearCountInCurrentLoop == 2`;
+- else `iscHardwareProgPortal_Haunt` (Solutional Haunt).
+
+`SolusFight.TriggerSirensCallPortal` (Siren's Call) arms Computational Exchange or Solutional Haunt the
+same way. Each goes through the `PortalSpawner.WillSpawn` setter into `OnWillSpawnUpdated` (MMHOOK has no
+hooks for property setters). With Alloyed Path / No Solutional Haunt portals,
+[AlternatePathPortals.cs](../EclipseAllMaps/AlternatePathPortals.cs) passes false there for Solutional
+Haunt's, and for Conduit Canyon's when Conduit Canyon is switched off (on it is a stage 4 of the rotation).
+The access-code fight and its reward stay. Computational Exchange returns to `Run.nextStageScene`
+(`CompExchangePortal`, `useRunNextStageScene`), and its `SpawnHardwarePortal` has no position set in the
+scene, so it never spawns.
+
+With Alloyed Path / Frog portal to Neural Sanctum, the frog's 10th pet also spawns `SolusWebPortal`
+(`RoR2/DLC3/SolusWebPortal.prefab`, "Decrypted Portal", exit to `solusweb`) on a copy of
+`iscColossusPortal` for its placement rules. Not without DLC3 (`CanPickStage(solusweb)`), nor once
+`SolusHeartBeaten`.
+
+## Teleporter bosses
 
 Conduit Canyon's teleporter has a `VultureFightOverride` (`triggerOnStart`): it forces the teleporter
-boss to a Solus Control Unit (`ForcedBossFight` = `cscRoboBallBoss`, singular, scaled), and at 75% health
-summons `VultureHunterMaster`, the Alloy Hunter, which kills it and takes its place. Its own boss deck
-(`dccsConduitcanyonBosses`: Solus Amalgamator) never gets used. [AlloyHunterBoss.cs](../EclipseAllMaps/AlloyHunterBoss.cs)
-clears `triggerOnStart` on Conduit Canyon in play, so that deck picks one boss. Both this and the pool
-entry below hang on one setting (Bosses / `AlloyHunterFromStageFour`, the key kept from when it only
-meant the pool), so turning it off gives the Alloy Hunter back its vanilla place. From stage 4
-(`stageClearCount` >= 3) on any map, `CombatDirector.SetNextSpawnAsBoss` on the teleporter's boss
-director first rolls the Alloy Hunter (`RoR2/DLC3/VultureHunter/cscVultureHunter.asset`: 800 credits, air,
-allowed as boss) at 1 in (bosses + 1), counting bosses as vanilla does (available champions not
-`forbiddenAsBoss`), and makes it the boss card with `OverrideNextBossCard`. Needs DLC3
-(`DirectorCard.IsAvailable`).
+boss to a Solus Control Unit (`ForcedBossFight` = `cscRoboBallBoss`, singular and scaled unless a Shrine
+of the Mountain is active), and at 75% health summons `VultureHunterMaster`, the Alloy Hunter, once
+(`singularKiller`), with `ScaleDifficultyAsBoss()` (health × (1 + difficulty / 2.5) × √players, damage ×
+(1 + difficulty / 30)); it kills the unit and takes its place. Its boss director carries its own deck
+(`dccsConduitcanyonBosses`: Solus Amalgamator, weight 3) and starts with 800 credits; every other
+teleporter's starts with 0.
 
-Balance, checked against the other bosses (body stats; damage coefficients from the entity state
-configurations):
+[TeleporterBosses.cs](../EclipseAllMaps/TeleporterBosses.cs) clears `triggerOnStart` on Conduit Canyon in
+play when Conduit Canyon / Robot bosses or Bosses / `AlloyHunterFromStageFour` (the key kept from when it
+only meant the boss pool) is on, and zeroes those 800 credits, so the fight is bought like any stage 4
+boss. It hooks `CombatDirector.SetNextSpawnAsBoss` on the teleporter's boss director, which the charging
+state calls with the boss credits in: 600 × √difficulty × (1 + Mountain stacks + hex stacks). Unless a
+boss is already forced, it picks:
 
-| Boss | Cost | Health (+/level) | Armor | Health × (1 + armor/100) | Damage | Hardest hits |
+- Robot bosses, on Conduit Canyon: Solus Control Unit, Alloy Worship Unit, Solus Amalgamator or Alloy
+  Hunter, `rng.RangeInt(0, 4)`. The unit and the Amalgamator go in as ordinary boss cards
+  (`OverrideNextBossCard`, not singular): as many as the credits buy, elite when they stretch to it.
+- Alloy Hunter as a normal boss, from stage 4 (`stageClearCount` >= 3) on any map, Conduit Canyon too
+  with Robot bosses off: the Alloy Hunter at 1 in (bosses + 1), counting bosses as vanilla does
+  (available champions not `forbiddenAsBoss`). Not on a stage without any, such as Void Locus's Lunar
+  family event, where it would be certain.
+
+Neither under the Artifact of Kin, which keeps a stage to one monster type. Both need DLC3.
+
+Robot bosses on stage 4 (body stats; damage coefficients from the entity state configurations):
+
+| Boss | Cost | Health (+/level) | Armor | Health × (1 + armor/100) | Damage | Vanilla on stage 4 |
 | --- | --- | --- | --- | --- | --- | --- |
-| Solus Control Unit | 800 | 2500 (+750) | 20 | 3000 | 15 | eye blast 1× |
-| Magma Worm | 800 | 2400 (+720) | 15 | 2760 | 10 | |
-| Imp Overlord | 800 | 2800 (+840) | 20 | 3360 | 16 | blink 4×, ground pound 2× |
-| Void Devastator | 800 | 2800 (+840) | 20 | 3360 | 12 | |
-| Solus Amalgamator | 800 | 3000 (+900) | 20 | 3600 | 15 | flamethrower turret 4.2×, shock armor 4×, artillery 3× |
-| Alloy Hunter | 800 | 3600 (+1080) | 0 | 3600 | 15 | bombing run 5×, calldown 3×, bombing laser 2.2× |
-| Grandparent | 1150 | 3625 (+1088) | 20 | 4350 | 26 | |
+| Solus Control Unit | 800 | 2500 (+750) | 20 | 3000 | 15 | Siren's Call, Repurposed Crater, Solus family event |
+| Alloy Worship Unit | 0 (counted 800) | 2500 (+750) | 30 | 3250 | 15 | Siren's Call bonus boss, single and scaled |
+| Solus Amalgamator | 800 | 3000 (+900) | 20 | 3600 | 15 | Conduit Canyon's deck, Solus family event |
+| Alloy Hunter | 800 | 3600 (+1080) | 0 | 3600 | 15 | Conduit Canyon, single and scaled |
+| Imp Overlord (for scale) | 800 | 2800 (+840) | 20 | 3360 | 16 | most stage 4 maps |
 
-It matches the Solus Amalgamator, with a slightly harder single hit. Its body starts in
-`GenericCharacterMain` (the murder entrance is only set by the override), so a director spawn is a plain
-boss. Vanilla's Conduit Canyon summons it with `ScaleDifficultyAsBoss()` (BoostHp worth +difficulty/2.5
-of its health, √players, plus BoostDamage); through the boss director it is an ordinary 800-credit boss
-(not `singularSpawn`), so as a pool boss it is weaker than vanilla's Conduit Canyon one. Reformed Altar and Treeborn Colony were already seer options in vanilla; Conduit
-  Canyon is filtered out of the Bazaar.
-- **`run_scene_override`** (cheat convar) keeps forcing the first stage.
-- **Multiplayer.** Picking is server-only and clients load the scene by name, so only the host needs the
-  mod. No `NetworkCompatibility` is declared.
+Hardest hits: Solus Control Unit eye blast 1×; Imp Overlord blink 4×, ground pound 2×; Solus Amalgamator
+flamethrower turret 4.2×, shock armor 4×, artillery 3×; Alloy Hunter bombing run 5×, calldown 3×, bombing
+laser 2.2×. All four sit within 20% of each other in effective health, around the other stage 4 bosses.
+Left out: Xi Construct (not `Mechanical`, not of the Solus line) and the scripted arena bosses Solus Wing
+and Solus Heart (`cscSolusWing` costs 0, its Solus Wing body has 1000 base armor).
+
+### One at a time
+
+Vanilla never buys the Alloy Hunter or the Alloy Worship Unit with credits: the Hunter is only Conduit
+Canyon's single summon (`dccsVultureFamily` holds it but is in no stage pool), the Alloy Worship Unit only
+Siren's Call's `SuperRoboBallEncounter` (`grantUniqueBonusScaling`, so `ScaleDifficultyAsBoss`), and
+`cscSuperRoboBallBoss` costs 0. Bought as an 800-credit boss, the Alloy Hunter came four or five at a time
+late in a run: stage 5 at 35 minutes in Eclipse is difficulty ≈ 11, about 2000 boss credits, 4000 with a
+Shrine of the Mountain, and five hunters' bombing runs (5×) at once.
+
+[SoloBoss.cs](../EclipseAllMaps/SoloBoss.cs) spawns them from a copy of the card that costs one share:
+credits / (1 + Mountain stacks + hex stacks), never below the usual cost (800; the Alloy Worship Unit
+counts as the Solus Control Unit whose body it shares) or above all the credits. The director then spawns
+one per share (at most 6 a wave, elite only from 6 shares, as for any card) and pays a share's gold and
+experience for each. On `SpawnCard.onSpawnedServerGlobal`, which runs after the director's own elite and
+multiplayer BoostHp, each gets BoostHp for health × share / usual cost, multiplied with those. At that
+35-minute stage 5: one hunter with ×2.5 health, or two with a Mountain shrine, where vanilla's scaled
+Conduit Canyon one has ×5.4. A fight keeps the total health its credits buy, in fewer bodies, with the
+card's own damage. The Alloy Hunter's body starts in `GenericCharacterMain` (the murder entrance is only
+set by the override), so a director spawn is a plain boss.
 
 ## Director credits
 
@@ -290,4 +394,3 @@ usual number of them. [AddedMapInteractables.cs](../EclipseAllMaps/AddedMapInter
 same DLC limit vanilla passes) combined with Void Locus's own list by `DCCSBlender.BlendSpecificDCCS`.
 That keeps every category at its own weight, so `VoidStuff` (45) is as likely as Chests (45): about a
 third of the category picks, out of roughly 145 total weight.
-- An Eclipse-menu toggle. The switches are config entries, shown as checkboxes by Risk Of Options.

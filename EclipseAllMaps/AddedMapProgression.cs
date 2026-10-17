@@ -1,5 +1,4 @@
 using RoR2;
-using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 
@@ -14,29 +13,14 @@ namespace EclipseAllMaps
     ///   (Mithrix), and "Shift Destination" sends the run on to stage 1 instead.
     /// - Conduit Canyon's teleporter, placed in the scene, is wired to Solutional Haunt (the Alloyed path).
     ///   It goes to the run's next stage instead, picked from the stage 5 pool like any stage 4 map's.
-    /// - Reformed Altar and Treeborn Colony (Golden Dieback) open no green Colossus portal. Every teleporter
-    ///   carries one for those maps (100%), leading on down the Colossus path to the next of them and Prime
-    ///   Meridian, which would take the run off the stage rotation.
-    /// - Nor does a Halcyon Shrine, on any map: once its gold is in, it opens one on stages 1-3 of the other
-    ///   maps. Its gold portal (Gilded Coast) stays.
     ///
-    /// Each has its own setting, and applies only where the mod does and (for an added map) that map is
-    /// switched on. The Colossus path's end, Prime Meridian and False Son, stays reachable the way the
-    /// Planetarium is: petting Commencement's frog 10 times after Mithrix opens a green portal there next to
-    /// the void one.
+    /// Each has its own setting, and applies only where the mod does and that map is switched on. The green
+    /// Colossus portals Reformed Altar and Treeborn Colony open are closed in <see cref="AlternatePathPortals"/>.
     /// </summary>
     internal static class AddedMapProgression
     {
         private const string VoidLocus = "voidstage";
         private const string ConduitCanyon = "conduitcanyon";
-        private const string PrimeMeridian = "meridian";
-
-        /// <summary>The green Colossus portal (<c>PortalColossus</c>), which vanilla teleporters carry.</summary>
-        private const string ColossusPortalCard = "iscColossusPortal";
-        private const string ColossusPortalAddress = "RoR2/DLC2/iscColossusPortal.asset";
-
-        /// <summary>Set once False Son is beaten; vanilla opens no more Colossus portals after it.</summary>
-        private const string FalseSonBeatenFlag = "FalseSonBossComplete";
 
         /// <summary>
         /// The stage 5 map whose destinations Void Locus, which has none, borrows for the Primordial
@@ -96,89 +80,6 @@ namespace EclipseAllMaps
                     Log.Info($"Conduit Canyon: the teleporter leads to {Run.instance.nextStageScene?.cachedName} instead of the Alloyed path.");
                 }
             };
-
-            // Start rolls the portal against spawnChance, and turns on its preview orb if it will spawn.
-            On.RoR2.PortalSpawner.Start += (orig, self) =>
-            {
-                if (NetworkServer.active && self.portalSpawnCard && self.portalSpawnCard.name == ColossusPortalCard
-                    && ModSettings.NoColossusPortals.Value && IsClosedColossusPortal(self, out string source))
-                {
-                    self.spawnChance = -1f;
-                    Log.Info($"{SceneCatalog.mostRecentSceneDef.cachedName}: no green Colossus portal from the {source}.");
-                }
-
-                orig(self);
-            };
-
-            // Commencement's frog shows up for the escape after Mithrix; at maxPets it opens the void portal.
-            On.RoR2.FrogController.Pet += (orig, self, interactor) =>
-            {
-                orig(self, interactor);
-
-                if (NetworkServer.active && self.petCount == self.maxPets && ModSettings.FrogPortalToPrimeMeridian.Value && EclipseStagePool.IsActive(Run.instance))
-                {
-                    OpenPrimeMeridianPortal(self.transform.position);
-                }
-            };
-        }
-
-        /// <summary>
-        /// Opens a green Colossus portal to Prime Meridian near <paramref name="position"/>, unless the run
-        /// lacks DLC2 or has beaten False Son already.
-        /// </summary>
-        private static void OpenPrimeMeridianPortal(Vector3 position)
-        {
-            Run run = Run.instance;
-            SceneDef primeMeridian = SceneCatalog.FindSceneDef(PrimeMeridian);
-            if (!primeMeridian || !run.CanPickStage(primeMeridian) || run.GetEventFlag(FalseSonBeatenFlag))
-            {
-                return;
-            }
-
-            SpawnCard portalCard = Addressables.LoadAssetAsync<SpawnCard>(ColossusPortalAddress).WaitForCompletion();
-            var placement = new DirectorPlacementRule
-            {
-                placementMode = DirectorPlacementRule.PlacementMode.Approximate,
-                minDistance = 10f,
-                maxDistance = 40f,
-                position = position,
-            };
-            GameObject portal = portalCard
-                ? DirectorCore.instance.TrySpawnObject(new DirectorSpawnRequest(portalCard, placement, new Xoroshiro128Plus(run.stageRng.nextUlong)))
-                : null;
-            if (!portal)
-            {
-                Log.Warning("Could not place the portal to Prime Meridian.");
-                return;
-            }
-
-            // It would get there anyway (no tier matches Commencement, so it falls back to its own
-            // destination), but not by design; this pins it.
-            if (portal.TryGetComponent(out SceneExitController exit))
-            {
-                exit.isAlternatePath = false;
-                exit.useRunNextStageScene = false;
-                exit.destinationScene = primeMeridian;
-            }
-
-            Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = "PORTAL_STORM_OPEN" });
-            Log.Info("Commencement: the frog opened a portal to Prime Meridian.");
-        }
-
-        /// <summary>
-        /// Whether a green Colossus portal spawner is one this mod closes: a Halcyon Shrine's (stages 1-3 of
-        /// other maps, once its gold is in) anywhere the mod is on, or the teleporter's on an added map.
-        /// </summary>
-        private static bool IsClosedColossusPortal(PortalSpawner spawner, out string source)
-        {
-            if (spawner.GetComponentInParent<HalcyoniteShrineInteractable>())
-            {
-                source = "Halcyon Shrine";
-                return EclipseStagePool.IsActive(Run.instance);
-            }
-
-            source = "teleporter";
-            return AddedMaps.InPlay() != null;
         }
 
         /// <summary>
