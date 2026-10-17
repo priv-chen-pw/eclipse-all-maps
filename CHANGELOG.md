@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+* New icon: the four added maps under an eclipse.
+* The README shows a preview of each added map.
+
 ## 1.0.0
 
 First release.
