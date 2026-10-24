@@ -28,7 +28,7 @@ namespace EclipseAllMaps
         internal static void AddOptions(IEnumerable<(ConfigEntryBase entry, string label)> options)
         {
             ModSettingsManager.SetModDescription(
-                "Adds every map to the normal Eclipse stage rotation.",
+                "For more randomized Eclipse runs: every map in the stage rotation, and a random final boss after stage 5.",
                 EclipseAllMapsPlugin.PluginGuid,
                 EclipseAllMapsPlugin.PluginName);
 

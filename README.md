@@ -1,63 +1,62 @@
 # Eclipse All Maps
 
-> **Early version.** This mod is new and not thoroughly tested yet. Please report bugs and balance issues on [GitHub](https://github.com/priv-chen-pw/eclipse-all-maps).
+> **Important:** this mod is made only for more randomized Eclipse runs.
 
-Adds the four portal-only maps to the stage rotation of Eclipse runs and keeps the run on that rotation. Made mainly for no-loop Eclipse climbs.
+> **Early version.** Not fully tested yet. Please report bugs and balance issues on [GitHub](https://github.com/priv-chen-pw/eclipse-all-maps).
 
-| Stage | Added map | Preview | Changes |
+* Four maps you normally only reach through a portal join the normal stage rotation.
+* Portals that lead off the rotation are closed.
+* The stage 5 teleporter takes you to a random final boss.
+
+## New maps
+
+| Stage | Map | Preview | Changes |
 | --- | --- | --- | --- |
-| 2 | Reformed Altar | ![Reformed Altar](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/reformed-altar.jpg) | • Stage 2 chest and monster credits<br>• No green portal |
-| 3 | Treeborn Colony | ![Treeborn Colony](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/treeborn-colony.jpg) | • No green portal<br>• Golden Dieback after looping |
-| 4 | Conduit Canyon | ![Conduit Canyon](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/conduit-canyon.jpg) | • Teleporter leads to stage 5, not the Alloyed path<br>• One boss fight: Solus Control Unit, Alloy Worship Unit, Solus Amalgamator or Alloy Hunter, equally likely<br>• Stage 4 monster credits |
-| 5 | Void Locus | ![Void Locus](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/void-locus.jpg) | • Primordial Teleporter instead of Deep Void Signals, so no void fog<br>• Sky Meadow's chests, shrines, printers and drones next to its void interactables<br>• First loop: half Sky Meadow's monsters, half its own, no Void Jailers<br>• Stage 5 chest credits (220 → 545) |
+| 2 | Reformed Altar | ![Reformed Altar](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/reformed-altar.jpg) | No green portal |
+| 3 | Treeborn Colony | ![Treeborn Colony](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/treeborn-colony.jpg) | No green portal. Golden Dieback after looping |
+| 4 | Conduit Canyon | ![Conduit Canyon](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/conduit-canyon.jpg) | Teleporter goes to stage 5. One random robot boss |
+| 5 | Void Locus | ![Void Locus](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/void-locus.jpg) | A Primordial Teleporter instead of the void signals. Void-themed bosses. Normal stage 5 chests and shrines, and on the first loop monsters, mixed in |
 
-Each added map is as likely as any other map of its stage. Everything can be switched off in **Settings → Mod Options**. Only the host needs the mod.
+Each new map gets the chest and monster budget of its stage and is as likely as any other map. Void Locus's teleporter boss is a Void Devastator, Imp Overlord, Xi Construct, Wandering Vagrant or Grandparent.
+
+## Final boss
+
+The stage 5 teleporter, aligned with the moon, takes you to one of five final bosses. You don't get the same boss twice until you have seen them all. Shift Destination still loops.
+
+Chat drops a hint about the boss, like the Bazaar's seers:
+
+* *You dream of a king, ruling over nothing.* Mithrix
+* *You dream of stars, drowning in the dark.* Voidling
+* *You dream of thunder, and a forsaken heir.* False Son
+* *You dream of steel wings, and an unblinking eye.* Solus Wing
+* *You dream of scales, tipped askew.* Anima Harvester
+
+After the boss you choose: end the run with a win, or loop. The mod's own portal appears near the arena's exit (on Commencement, next to the frog).
+
+| Boss | Map | End the run | Loop |
+| --- | --- | --- | --- |
+| ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/boss-mithrix.png) Mithrix | ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/map-commencement.jpg) Commencement | The ship | Added portal |
+| ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/boss-voidling.png) Voidling | ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/map-planetarium.jpg) The Planetarium | Its exit portal | Added portal |
+| ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/boss-false-son.png) False Son | ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/map-prime-meridian.jpg) Prime Meridian | Added portal\* | Its portal |
+| ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/boss-solus-wing.png) Solus Wing | ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/map-solutional-haunt.jpg) Solutional Haunt | Added portal | Teleporter (Shift Destination) |
+| ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/boss-anima-harvester.png) Anima Harvester | ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/map-soulbound-threshold.jpg) Soulbound Threshold | Added portal\* | Its portal |
+
+\* Eclipse turns these bosses' own endings off, so the mod adds one.
+
+On Soulbound Threshold the monsters have 60% health and the Anima Harvester 80%. Secret bosses work as before. The Shrine of Descent no longer breaks the teleporter or opens a portal.
+
+The added portal that ends the run is a Celestial Portal. It only appears when the map is your final stage. Step through and the run ends as a win, with the boss's own ending.
 
 ## Other changes
 
-* **No portals off the rotation.** No green portals open: not from teleporters, Halcyon Shrines, Gilded Coast or the Bazaar's geodes. Solved access codes and Siren's Call no longer open a portal to Solutional Haunt. You still get the access codes' extra boss and item, and on stage 3 they still open their portal to Conduit Canyon. Gold portals to Gilded Coast are unchanged.
-
-### Halcyon Shrine
-
-![Halcyon Shrine](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/halcyon-shrine.jpg)
-
-Can spawn on every stage, with its usual cost and odds. From stage 4 it is weaker: its monster waves get half the credits, and its Halcyonite gets half the bonus from the gold (at most ×5.2 health and ×2.75 damage instead of ×10 and ×4.75).
-
-### Prime Meridian and Neural Sanctum
-
-![The frog on Commencement](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/frog.jpg)
-
-After Mithrix, pet the frog 10 times. Besides the portal to the Planetarium (Voidling), two more open: Prime Meridian (False Son) and Neural Sanctum (Solus Heart). Rebirth and accepting Solus Heart's offering both count as Eclipse wins.
-
-### Alloy Hunter
-
-![Alloy Hunter](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/alloy-hunter.jpg)
-
-From stage 4 it can be the teleporter boss on any map, as likely as any of the map's own bosses. It comes alone, plus one more per Shrine of the Mountain. Each one gets the health of the extra hunters the boss credits would have bought, so the total health is the same as any other boss fight. The Alloy Worship Unit on Conduit Canyon works the same way.
+* No green portals, and no portals to Solutional Haunt. Access codes still give their extra boss and item.
+* Halcyon Shrines can spawn on every stage. From stage 4 they are weaker.
+* From stage 4 the Alloy Hunter can be a teleporter boss. It comes alone, plus one per Shrine of the Mountain, with the total health of a normal boss fight.
 
 ## Settings
 
-In game under **Settings → Mod Options**, or in r2modman's config editor. Changes apply from the next stage. Everything is on by default unless marked (off).
-
-* **General:** Add all maps to Eclipse (the whole mod) · Also in normal runs (off) · Added map chance (1×, from 0.1× to 5×) · Balance chest and monster credits
-* **Stage 1-5:** a checkbox for every map of the stage, vanilla or added. A map switched off doesn't roll and isn't offered by Lunar Seers.
-* **Void Locus:** Primordial Teleporter (off: Deep Void Signals, so a run that rolls Void Locus ends with Voidling) · Stage 5 monsters · Stage 5 interactables
-* **Conduit Canyon:** Teleporter to stage 5 · Robot bosses (off: Solus Amalgamator, or Alloy Hunter)
-* **Colossus Path:** No green portals · Frog portal to Prime Meridian · Halcyon Shrine on every stage · Weaker Halcyon Shrines from stage 4
-* **Alloyed Path:** No Solutional Haunt portals · Frog portal to Neural Sanctum
-* **Bosses:** Alloy Hunter as a normal boss (off, together with Robot bosses: vanilla's scripted Conduit Canyon fight)
-* **Debug:** Only added maps (off): only the added maps roll on stages 2-5. For testing.
-
-## Requirements
-
-Anything that needs a DLC that is off for the run is skipped.
-
-* **Seekers of the Storm:** Reformed Altar, Treeborn Colony, Halcyon Shrine, Prime Meridian portal.
-* **Alloyed Collective:** Conduit Canyon, Alloy Hunter, Neural Sanctum portal.
-* **Survivors of the Void:** Void Locus.
-
-Risk Of Options shows the settings in game; without it they are still in the config file.
+Every change can be switched off in **Settings → Mod Options** (with Risk Of Options) or in r2modman's config editor. Every map and every final boss has its own checkbox. Changes apply from the next stage. Only the host needs the mod, and content from a DLC that is off is skipped.
 
 ## Credits
 
-Images from the [Risk of Rain 2 Wiki](https://riskofrain2.wiki.gg/).
+Map previews of the new maps from the [Risk of Rain 2 Wiki](https://riskofrain2.wiki.gg/); boss and final map icons from the game's files.

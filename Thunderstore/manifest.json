@@ -1,8 +1,8 @@
 {
   "name": "EclipseAllMaps",
-  "version_number": "1.1.1",
+  "version_number": "2.0.0",
   "website_url": "https://github.com/priv-chen-pw/eclipse-all-maps",
-  "description": "Adds Reformed Altar, Treeborn Colony, Conduit Canyon and Void Locus to the Eclipse stage rotation, balanced for their stage, and closes portals that lead off it. Every change can be switched off in Mod Options.",
+  "description": "For more randomized Eclipse runs: adds Reformed Altar, Treeborn Colony, Conduit Canyon and Void Locus to the stage rotation, closes portals off it, and sends stage 5 to a random final boss. Every change can be switched off.",
   "dependencies": [
     "bbepis-BepInExPack-5.4.2122",
     "RiskofThunder-HookGenPatcher-1.2.9",

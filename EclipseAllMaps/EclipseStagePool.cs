@@ -102,6 +102,8 @@ namespace EclipseAllMaps
                 return;
             }
 
+            DebugStageFive.ReplaceStageOne(run, choices);
+
             // A pool only ever holds one stage's maps, so any entry tells which stage is being picked.
             int stage = choices.GetChoice(0).value.stageOrder;
             List<SceneDef> addedMaps = MapsForStage(run, stage);
@@ -146,7 +148,8 @@ namespace EclipseAllMaps
         /// <paramref name="addedMaps"/> (when it has any).
         /// </summary>
         private static Predicate<SceneDef> PoolFilter(List<SceneDef> addedMaps) =>
-            ModSettings.OnlyAddedMaps.Value && addedMaps.Count > 0
+            // Start at stage 5 is for testing the stage 5 pool as it is, Void Locus among the others.
+            ModSettings.OnlyAddedMaps.Value && !ModSettings.StartAtStageFive.Value && addedMaps.Count > 0
                 ? (Predicate<SceneDef>)addedMaps.Contains
                 : StageMaps.IsEnabled;
 

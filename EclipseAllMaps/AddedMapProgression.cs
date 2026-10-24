@@ -9,8 +9,9 @@ namespace EclipseAllMaps
     ///
     /// - Void Locus spawns no Deep Void Signals, so there is no void fog (only a charging signal raises it)
     ///   and no portal to the Planetarium. The scene director places a Primordial Teleporter instead, the
-    ///   one Sky Meadow and Helminth Hatchery use: it starts aligned with the moon, leading to Commencement
-    ///   (Mithrix), and "Shift Destination" sends the run on to stage 1 instead.
+    ///   one Sky Meadow and Helminth Hatchery use: it starts aligned with the moon, leading to the final stage
+    ///   (see <see cref="FinalStage"/>), and "Shift Destination" sends the run on to stage 1 instead. Leaving
+    ///   it begins a loop, as leaving any stage 5 does.
     /// - Conduit Canyon's teleporter, placed in the scene, is wired to Solutional Haunt (the Alloyed path).
     ///   It goes to the run's next stage instead, picked from the stage 5 pool like any stage 4 map's.
     ///
@@ -24,7 +25,8 @@ namespace EclipseAllMaps
 
         /// <summary>
         /// The stage 5 map whose destinations Void Locus, which has none, borrows for the Primordial
-        /// Teleporter's planet alignment: stage 1, or the looped stage 1 pool after a loop.
+        /// Teleporter's planet alignment (and the final stages for their portals on): stage 1, or the looped
+        /// stage 1 pool after a loop.
         /// </summary>
         private const string VoidLocusLeadsOnLike = "skymeadow";
 
@@ -59,16 +61,19 @@ namespace EclipseAllMaps
             // The teleporter picks the next stage from the current map's destinations as soon as it spawns.
             On.RoR2.Run.PickNextStageSceneFromCurrentSceneDestinations += (orig, self) =>
             {
-                if (!VoidLocusGetsTeleporter())
+                if (VoidLocusGetsTeleporter())
+                {
+                    PickStageOne(self);
+                }
+                else
                 {
                     orig(self);
-                    return;
                 }
-
-                var choices = new WeightedSelection<SceneDef>();
-                SceneCatalog.FindSceneDef(VoidLocusLeadsOnLike).AddDestinationsToWeightedSelection(choices, self.CanPickStage);
-                self.PickNextStageScene(choices);
             };
+
+            // Vanilla begins a loop when the run leaves a stageOrder 5 map; Void Locus is filed under 99. Without
+            // it the loop count, the stage count within the loop and the loop's event flags never move on.
+            On.RoR2.Run.ShouldBeginLoop += (orig, self, sceneDef) => orig(self, sceneDef) || VoidLocusGetsTeleporter();
 
             On.RoR2.TeleporterInteraction.Start += (orig, self) =>
             {
@@ -80,6 +85,17 @@ namespace EclipseAllMaps
                     Log.Info($"Conduit Canyon: the teleporter leads to {Run.instance.nextStageScene?.cachedName} instead of the Alloyed path.");
                 }
             };
+        }
+
+        /// <summary>
+        /// Picks the run's next stage the way a stage 5 teleporter does: from Sky Meadow's destinations, stage 1,
+        /// or the looped stage 1 pool after a loop.
+        /// </summary>
+        internal static void PickStageOne(Run run)
+        {
+            var choices = new WeightedSelection<SceneDef>();
+            SceneCatalog.FindSceneDef(VoidLocusLeadsOnLike).AddDestinationsToWeightedSelection(choices, run.CanPickStage);
+            run.PickNextStageScene(choices);
         }
 
         /// <summary>

@@ -13,12 +13,31 @@ namespace EclipseAllMaps
     /// - Robot bosses: Conduit Canyon's boss is a Solus Control Unit, Alloy Worship Unit, Solus Amalgamator or
     ///   Alloy Hunter, each as likely. The first and third are ordinary 800-credit bosses on stage 4 maps
     ///   already; the other two come as <see cref="SoloBoss"/>es.
-    /// - Alloy Hunter as a normal boss: from stage 4 on any map's teleporter can roll the Alloy Hunter (as a
+    /// - Void bosses: Void Locus's boss is one that suits a void-torn place (see <see cref="VoidLocusBossAddresses"/>),
+    ///   each as likely. Its own pool only has the Void Devastator, a big monster more than a boss, and on the first
+    ///   loop half its boss picks were that.
+    /// - Alloy Hunter as a normal boss: from stage 4 on any other map's teleporter can roll the Alloy Hunter (as a
     ///   <see cref="SoloBoss"/>), as likely as any one of the stage's own bosses.
     /// </summary>
     internal static class TeleporterBosses
     {
         private const string ConduitCanyon = "conduitcanyon";
+        private const string VoidLocus = "voidstage";
+
+        /// <summary>
+        /// Void Locus's bosses: its own Void Devastator, the Imp Overlord of the Red Plane, the Xi Construct of the
+        /// same expansion as the Void, the drifting Wandering Vagrant, and the Grandparent, a stage 5 boss already.
+        /// </summary>
+        private static readonly string[] VoidLocusBossAddresses =
+        {
+            "RoR2/DLC1/VoidMegaCrab/cscVoidMegaCrab.asset",
+            "RoR2/Base/ImpBoss/cscImpBoss.asset",
+            "RoR2/DLC1/MajorAndMinorConstruct/cscMegaConstruct.asset",
+            "RoR2/Base/Vagrant/cscVagrant.asset",
+            "RoR2/Base/Grandparent/cscGrandparent.asset",
+        };
+
+        private static DirectorCard[] voidLocusBosses;
 
         /// <summary>Stages cleared by the time stage 4 starts.</summary>
         private const int Stage4ClearCount = 3;
@@ -81,6 +100,10 @@ namespace EclipseAllMaps
             {
                 PickRobotBoss(bossDirector, teleporter);
             }
+            else if (ModSettings.VoidLocusBosses.Value && AddedMaps.InPlay()?.SceneName == VoidLocus)
+            {
+                PickVoidLocusBoss(bossDirector);
+            }
             else if (ModSettings.AlloyHunterBoss.Value && Run.instance.stageClearCount >= Stage4ClearCount)
             {
                 RollAlloyHunter(bossDirector, teleporter);
@@ -110,6 +133,21 @@ namespace EclipseAllMaps
                 default:
                     AlloyHunter.OverrideNextBoss(bossDirector, teleporter);
                     break;
+            }
+        }
+
+        /// <summary>
+        /// One of Void Locus's bosses, each as likely among those its DLC allows and the boss credits buy at least
+        /// one of (the Grandparent costs 1150, the others 800). With none, the stage's own pick stands.
+        /// </summary>
+        private static void PickVoidLocusBoss(CombatDirector bossDirector)
+        {
+            voidLocusBosses ??= System.Array.ConvertAll(VoidLocusBossAddresses, NewCard);
+            DirectorCard[] affordable = System.Array.FindAll(voidLocusBosses, card => card.IsAvailable() && card.cost <= bossDirector.monsterCredit);
+            if (affordable.Length > 0)
+            {
+                DirectorCard card = affordable[bossDirector.rng.RangeInt(0, affordable.Length)];
+                OverrideWith(bossDirector, card, card.GetSpawnCard().name);
             }
         }
 

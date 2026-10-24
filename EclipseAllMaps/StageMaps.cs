@@ -8,12 +8,15 @@ namespace EclipseAllMaps
     /// A checkbox for every map an Eclipse run can roll on stages 1-5, in a config section per stage: the
     /// vanilla pools (sgStageN and loopSgStageN, as shipped) plus <see cref="AddedMaps"/>. A map switched off
     /// is left out of the stage pool and the Bazaar's seers. A map not listed here (a later patch's) stays on.
+    /// The final stages <see cref="FinalStage"/> picks from after stage 5 have theirs too.
     /// </summary>
     internal static class StageMaps
     {
         private const string FirstLoopOnly = " Only rolls on the first loop.";
         private const string AfterLoopingOnly = " Only rolls after looping.";
         private const string SecondLayout = " Its second layout.";
+        private const string FinalStageSection = "Final Stage";
+        private const string FinalStageNote = " One of the final stages the stage 5 teleporter picks from; with every one off it leads to Commencement.";
 
         internal static readonly StageMap[] All =
         {
@@ -53,7 +56,13 @@ namespace EclipseAllMaps
             new StageMap(5, "skymeadow", "Sky Meadow"),
             new StageMap(5, "helminthroost", "Helminth Hatchery"),
             new StageMap(5, "voidstage", "Void Locus",
-                " Added by this mod. Instead of Deep Void Signals it has a Primordial Teleporter, leading to Commencement (Mithrix) like Sky Meadow."),
+                " Added by this mod. Instead of Deep Void Signals it has a Primordial Teleporter, leading to the final stage like Sky Meadow's."),
+
+            new StageMap(FinalStageSection, "moon2", "Commencement", " Mithrix." + FinalStageNote),
+            new StageMap(FinalStageSection, "voidraid", "The Planetarium", " Voidling. Needs Survivors of the Void." + FinalStageNote),
+            new StageMap(FinalStageSection, "meridian", "Prime Meridian", " False Son. Needs Seekers of the Storm." + FinalStageNote),
+            new StageMap(FinalStageSection, "solutionalhaunt", "Solutional Haunt", " Solus Wing. Needs the Alloyed Collective." + FinalStageNote),
+            new StageMap(FinalStageSection, "champrush", "Soulbound Threshold", " The Anima Harvester. Needs Hallowed Concepts." + FinalStageNote),
         };
 
         private static readonly Dictionary<string, StageMap> bySceneName = new Dictionary<string, StageMap>();
@@ -76,17 +85,22 @@ namespace EclipseAllMaps
 
     internal sealed class StageMap
     {
-        internal readonly int Stage;
         internal readonly string SceneName;
 
         /// <summary>The in-game name with the scene name, which tells the layouts of a map apart.</summary>
         internal readonly string Label;
 
+        private readonly string section;
         private readonly string note;
 
         internal StageMap(int stage, string sceneName, string name, string note = "")
+            : this($"Stage {stage}", sceneName, name, note)
         {
-            Stage = stage;
+        }
+
+        internal StageMap(string section, string sceneName, string name, string note = "")
+        {
+            this.section = section;
             SceneName = sceneName;
             Label = $"{name} ({sceneName})";
             this.note = note;
@@ -96,7 +110,7 @@ namespace EclipseAllMaps
 
         // Keyed by scene name: BepInEx keys can't hold the apostrophes in some map names.
         internal void Bind(ConfigFile config) => Enabled = config.Bind(
-            $"Stage {Stage}",
+            section,
             SceneName,
             true,
             $"{Label}: switch off to keep it out of Eclipse runs.{note}");

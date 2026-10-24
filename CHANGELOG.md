@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.0
+
+* **Final stage:** the stage 5 Primordial Teleporter, aligned with the moon, leads to a random final stage: Commencement (Mithrix), the Planetarium (Voidling), Prime Meridian (False Son), Solutional Haunt (Solus Wing) or Soulbound Threshold (Anima Harvester). Chat drops a cryptic hint about which one, and none comes twice until the run has had them all. New settings section: Final Stage, with a checkbox per final stage.
+* **After the final boss:** every final stage has a way to end the run with a win and one on to the next loop. Commencement and the Planetarium get a Destination Portal to stage 1; Solutional Haunt, and in Eclipse Prime Meridian and Soulbound Threshold, get a Celestial Portal that ends the run. The added portal stands next to the map's own exit. New setting: End or loop after the final boss.
+* **Soulbound Threshold:** as the final stage its monsters have 60% health and the Anima Harvester 80%. New setting: Weaker Soulbound Threshold.
+* **Shrine of Descent:** after its 666% charge the teleporter works as usual and no Ritual Portal opens. New setting: Shrine of Descent keeps the teleporter.
+* **Frog:** no longer opens portals to Prime Meridian and Neural Sanctum, and both settings are gone. In Eclipse those routes never offered their ending anyway: Eclipse hides the Shrine of Rebirth and refuses Solus Heart's offering, so the 1.1.0 README was wrong about that.
+* **Void Locus:** its teleporter boss is a Void Devastator, Imp Overlord, Xi Construct, Wandering Vagrant or Grandparent. Before, its pool gave mostly Void Devastators, more a big monster than a boss. New setting: Void bosses.
+* **Void Locus:** leaving it begins a loop, as leaving any stage 5 does. Before, a loop from Void Locus didn't count: after it Golden Dieback didn't replace Treeborn Colony, and access codes no longer opened their portal to Conduit Canyon on stage 3.
+* **README:** shorter and simpler, with a note that the mod is made only for more randomized Eclipse runs. The settings list is gone: the settings explain themselves in game.
+
 ## 1.1.1
 
 * The Thunderstore page links to the GitHub repository.

@@ -76,11 +76,11 @@ Details worth knowing:
 - **Settings.** All bound in [ModSettings.cs](../EclipseAllMaps/ModSettings.cs), which also holds the Risk
   Of Options labels and menu order (a checkbox per bool; `AddedMapChance` is a 0.1-5 step slider from its
   `AcceptableValueRange`). Sections: General (`AddAllMapsToEclipse`, `AlsoInNormalRuns`, `AddedMapChance`,
-  `BalanceCredits`), Stage 1-5, Void Locus, Conduit Canyon, Colossus Path, Alloyed Path, Bosses, Debug. Each feature
+  `BalanceCredits`), Stage 1-5, Final Stage, Void Locus, Conduit Canyon, Colossus Path, Alloyed Path, Bosses, Debug. Each feature
   class checks its own entry next to `EclipseStagePool.IsActive` / `AddedMaps.InPlay`, which go through
   `ModSettings.AppliesTo`: an `EclipseRun`, or with `AlsoInNormalRuns` a plain `Run` (the classic mode;
   Simulacrum and Prismatic Trials are subclasses and never count). `AddAllMapsToEclipse` switches the mod. Every map in the vanilla pools plus
-  the added ones has a checkbox under `Stage 1`-`Stage 5`, keyed by scene name (BepInEx keys can't hold
+  the added ones has a checkbox under `Stage 1`-`Stage 5`, and each final stage one under `Final Stage`, keyed by scene name (BepInEx keys can't hold
   the apostrophes in "Siren's Call"), with "Name (scene)" as its Risk Of Options label; the list is
   [StageMaps.cs](../EclipseAllMaps/StageMaps.cs), and a map missing from it stays on. `PickNextStageScene`
   drops switched-off maps from the pool and the Bazaar seers skip them; if nothing rollable is left
@@ -106,7 +106,11 @@ Details worth knowing:
     destinations, so `PickNextStageSceneFromCurrentSceneDestinations` uses Sky Meadow's
     (`sgStage1`, or `loopSgStage1` after a loop). The boss comes from the stage's champions (see
     Monsters below). With none at all, as under Void Locus's rare Lunar family event after a loop, the
-    teleporter just finishes once charged (`BossGroup` only enables when a member joins).
+    teleporter just finishes once charged (`BossGroup` only enables when a member joins). Vanilla begins a
+    loop (`Run.OnLoopBeginServer`: loop count, `stageClearCountAtLoopStart`, `EventFlagsToResetOnLoop`)
+    when `AdvanceStage` leaves a scene `Run.ShouldBeginLoop` holds for, `stageOrder == 5`; it is hooked to
+    hold for Void Locus too. Before 2.0.0 a loop from Void Locus kept `loopClearCount` 0 and
+    `stageClearCountInCurrentLoop` counting from the run's start.
   - Conduit Canyon: its teleporter is placed in the scene with `useRunNextStageScene = false` and
     `destinationScene = solutionalhaunt`. After `TeleporterInteraction.Start` (which picks the next
     stage) `useRunNextStageScene` is set to true, so it goes to the stage 5 pick.
@@ -115,7 +119,8 @@ Details worth knowing:
 - **Looping.** Treeborn Colony becomes Golden Dieback under vanilla's own test from
   `SceneExitController.GetLoopedStageOrDefault` (`loopClearCount > 0 && stageClearCount > 5`).
 - **DLC.** A map whose expansion is off for the run is skipped (`Run.CanPickStage`).
-- **Eclipse's event flags.** `EclipseRun.Start` sets `NoVoidStage`, which only bans the teleporter's
+- **Eclipse's event flags.** `EclipseRun.Start` sets `NoArtifactWorld`, `NoMysterySpace`,
+  `NoVoidStage` and `NoSolusHeartOffer` (see Final stage). `NoVoidStage` only bans the teleporter's
   void portal (`PortalSpawner.bannedEventFlag`). Conduit Canyon still sets `HardwarePortalTaken` on
   load (`ConduitCanyonController.Awake`), which only stops Computational Exchange offering the
   Alloyed-path portal later.
@@ -158,16 +163,8 @@ sets a Colossus spawner's `spawnChance` to -1 before `PortalSpawner.Start` (whic
 preview orb): a teleporter's only on the added maps in play, any other wherever the mod is on. Hooking
 `Exit.IsValidStormTier` to return false closes Gilded Coast's.
 
-To keep the paths' endings reachable the mod mirrors the void route. Commencement (`moon2`) spawns
-`FrogInteractable` at `EscapeSequenceObjects/FrogSpawner` once Mithrix falls, and `FrogController.Pet`
-fires its `PortalSpawner` (`iscDeepVoidPortal`, the Planetarium) once `petCount >= maxPets` (10). On the
-pet that reaches it (`petCount == maxPets`, so once) the mod also spawns, 10-40 m from the frog:
-
-- `iscColossusPortal` pinned to `destinationScene = meridian` (it would land there anyway: from stageOrder
-  6 no tier matches). Not without DLC2, nor once False Son is beaten. After False Son, Prime Meridian's
-  Shrine of Rebirth offers the Rebirth ending (`RebirthEndingDef`, `isWin` 1, so it counts for Eclipse)
-  or a portal on to Helminth Hatchery; `PM DestinationPortal` goes to `Run.nextStageScene`.
-- Neural Sanctum's portal; see Alloyed path.
+The path's end, Prime Meridian, is one of the final stages; see Final stage. (Until 1.1.1 Commencement's
+frog opened a portal there, and one to Neural Sanctum.)
 
 ## Halcyon Shrine
 
@@ -220,8 +217,9 @@ Computational Exchange: handing the Solus vendor a Master Core (`SolusVendorShri
 runs `SolusWebPortalSequence` and spawns `SolusWebPortal`. Accepting Solus Heart's offering
 (`SolusHeartFinaleSequence.OfferingAccepted`) ends the run with `DecompileEnding` (`isWin` 1); killing it
 opens an exit to `Run.nextStageScene` (and, outside Eclipse, a void portal). `SolusWebMissionController`
-needs nothing from the quest (only the `NoSolusHeartOffer` flag, which nothing sets, skips the offering),
-and the scene has no event-flag responses.
+needs nothing from the quest, and the scene has no event-flag responses, but the `NoSolusHeartOffer` flag
+skips the offering, and `EclipseRun.Start` sets it: in Eclipse Solus Heart is always refused. Solutional
+Haunt is one of the final stages; see Final stage.
 
 Its portals off the rotation come from the access codes. `AccessCodesMissionController` (on Pretender's
 Precipice, Iron Alluvium / Iron Auroras and Repurposed Crater, and in the "Access Codes Portals" prefab)
@@ -244,10 +242,106 @@ The access-code fight and its reward stay. Computational Exchange returns to `Ru
 (`CompExchangePortal`, `useRunNextStageScene`), and its `SpawnHardwarePortal` has no position set in the
 scene, so it never spawns.
 
-With Alloyed Path / Frog portal to Neural Sanctum, the frog's 10th pet also spawns `SolusWebPortal`
-(`RoR2/DLC3/SolusWebPortal.prefab`, "Decrypted Portal", exit to `solusweb`) on a copy of
-`iscColossusPortal` for its placement rules. Not without DLC3 (`CanPickStage(solusweb)`), nor once
-`SolusHeartBeaten`.
+## Final stage
+
+[FinalStage.cs](../EclipseAllMaps/FinalStage.cs). The stage 5 maps (Sky Meadow, Helminth Hatchery, and Void
+Locus here) place the Primordial Teleporter (`LunarTeleporter Variant`), whose `SceneExitController` exits
+to `moon2`; its prongs only flip `useRunNextStageScene` (`Active`, aligned with the moon: false; `Idle`:
+true, the run's next stage from `sgStage1` / `loopSgStage1`). With Final Stage / Random final stage, after
+`TeleporterInteraction.Start` on a stage 5 (`stageOrder` 5, or Void Locus in play) a teleporter exiting to
+`moon2` gets one of the final stages switched on and available (`CanPickStage`) as `destinationScene`,
+`nextStageRng.RangeInt`, each as likely. With none it keeps `moon2`. Solutional Haunt's treasure-room
+teleporter (stageOrder 93) keeps `moon2`, so Solus Wing can still be followed by Mithrix.
+
+The pick is hinted at, in a Bazaar seer's "You dream of ..." words, after
+`EntityStates.LunarTeleporter.IdleToActive.OnExit`, which broadcasts "aligns with the moon": the prongs' state machine starts in `IdleToActive`, so that is at the stage's start and after each
+shift back. No final stage comes twice before the run has had them all: on `Stage.onServerStageBegin` one reached as the final
+stage (see below) sets the run event flag `EclipseAllMaps.FinalStageReached.<scene>` (run flags last the run;
+only `Run.EventFlagsToResetOnLoop` are cleared on a loop), and the pick skips flagged ones. When every
+choice is flagged their flags are cleared, and the one reached last sits out that pick. A final stage skipped
+with Shift Destination stays unflagged.
+
+Each final stage as shipped (health = base × (1 + armor / 100), summed over the phases):
+
+| Final stage | Scene (type, order) | DLC | Boss | Health | Its ending | Its way on |
+| --- | --- | --- | --- | --- | --- | --- |
+| Commencement | `moon2` (Stage, 6) | — | Mithrix: `BrotherBody` (1000, 20 armor) in phases 1 and 3, `BrotherHurtBody` (1400, not boss-scaled) in 4 | 2400 + 1680 | the ship, `MainEnding` | none |
+| The Planetarium | `voidraid` (Stage, 99) | 1 | Voidling: `MiniVoidRaidCrabBodyPhase1`-`3`, 2000 and 20 armor each | 7200 | `iscVoidOutroPortal`, `VoidEnding` | none |
+| Prime Meridian | `meridian` (Intermission, 96) | 2 | False Son: 1000 / 1100 / 1200, 23 / 29 / 26 armor | 4160 | Shrine of Rebirth, `RebirthEndingDef`; hidden in Eclipse | `iscDestinationPortal` |
+| Solutional Haunt | `solutionalhaunt` (Intermission, 93) | 3 | Solus Wing: 6069 behind 1000 armor, −25% per Memory Module (4 × 540, 10 armor), which together deal 80% of its health | about 3600 | none | treasure-room Primordial Teleporter, Shift Destination |
+| Soulbound Threshold | `champrush` (Intermission, 999) | 4 | Anima Harvester: `ReaperBossBody` 3510, `ReaperBossMalachiteBody` 2100, 20 armor | 6730 | sacrifice pit, `CRSacrificeEndingGood`; off from Eclipse 1 | `iscChampRushExitPortal` (Mortal Portal) |
+
+Every phase but Mithrix's fourth is a `ScriptedCombatEncounter` with `grantUniqueBonusScaling`, so
+`ScaleDifficultyAsBoss` scales them alike (health × (1 + difficulty / 2.5) × √players as BoostHp, damage ×
+(1 + difficulty / 30)) and the totals compare as they stand. Base damage is 13.5-18 for all. Beyond
+health: Mithrix steals items in phase 4; the Harvester heals 10% per soul-lock, gives each player 3 Hexes in
+phase 2, and comes after four challenges against a doom timer whose expiry (`FailChampRush`) kills the
+whole team. False Son and the Harvester are made for mid-run (vanilla reaches them by stage 4), Solus
+Wing for stage 5. With Final Stage / Weaker Soulbound Threshold, on Soulbound Threshold as the final stage
+every monster-team body gets `PercentMaxHealth` (hidden; `RecalculateStats` multiplies max health by
+stacks / 100 after every other bonus) on `CharacterBody.onBodyStartGlobal`: 60 stacks, or 80 for a
+`ReaperBoss*` body, so the Harvester has 5380 in all and its challengers 60% of theirs. Only a master
+without the item gets it, so a revived body isn't cut twice. The aim, the user's: the waves as threatening
+as Mithrix's phase 2, while the Harvester itself was never the hard part.
+
+Eclipse turns off three endings: `RevealRebirthShriine` hides the Shrine of Rebirth from Eclipse 1 and
+spawns its Destination Portal at once, `ChampRushSacrificeEndingListener.FixedUpdate` returns early from
+Eclipse 1, and `EclipseRun.Start` sets `NoSolusHeartOffer`. With Final Stage / End or loop after the final
+boss every final stage gets the missing half, beside the map's own exit: `DirectorPlacementRule.Approximate`
+10-18 m from it (10-40 m if no node is free that near), so it stands clear of the exit but next to it. The
+reference is the frog spawner on Commencement, the `voidoutro` exit on the Planetarium, the shrine's
+`portalObject` (where its Destination Portal spawns) on Prime Meridian, the `ChampRushExitPortal` on
+Soulbound Threshold, and the Mainline Portal on Solutional Haunt; exits are found through
+`InstanceTracker` (`SceneExitController` registers itself there).
+
+- A loop portal, `iscDestinationPortal` (`RoR2/DLC2/iscDestinationPortal.asset`, "Destination Portal", no
+  expansion requirement, `useRunNextStageScene`): Commencement on `EscapeSequenceController.BeginEscapeSequence`
+  near `EscapeSequenceObjects/FrogSpawner`, the Planetarium after `VoidRaidGauntletController.SpawnOutroPortal`
+  near the same `returnPoint`. The next stage is picked again from Sky Meadow's destinations first, since
+  some routes there leave a stage 5 up next (Solutional Haunt's teleporter, Void Locus's signals).
+  `doNotIncrementStageNumber` is set: both are `Stage` scenes, and counting them would start the next loop
+  at `stageClearCountInCurrentLoop` 1 (the access codes would then open their Conduit Canyon portal on stage
+  2). Looping straight from stage 5 or from the hidden-realm final stages counts nothing either.
+- An end portal, `iscMSPortal` (Celestial Portal, 10-18 m from the exit like the loop portal): Solutional Haunt after `SpawnEyePortal.OnEnter` (the
+  crashed Solus Wing's post-fight object, which opens the Mainline Portal to Computational Exchange),
+  `DecompileEnding`; in Eclipse, Prime Meridian after `RevealRebirthShriine.OnEnter`, `RebirthEndingDef`, and
+  Soulbound Threshold after `ChampRushMissionController.CompleteReaperFight` with `reaperSpawned`,
+  `CRSacrificeEndingGood` (its `SacrificeEnding` state skips the cutscene when the scene lacks the prop).
+  `SceneExitController.Begin` on it calls `Run.BeginGameOver` first, then teleports everyone out as usual: once the game is
+  over `Finished` loads no stage, and its `onFinishExit` is what `RebirthEndingStart` waits for. All five
+  endings are `isWin` 1. Only on the final stage: `stageClearCount > 0 && stageClearCountInCurrentLoop == 0`.
+  Leaving a stage 5 begins a loop and nothing was cleared in it since; Prime Meridian down the Colossus
+  path, Soulbound Threshold through a Shrine of Descent and Solutional Haunt from Conduit Canyon all come
+  after a cleared stage in the loop.
+
+Each announces itself in chat (the end portal after a line on the fallen boss) with a raw string as the token (`Language.GetString` returns an
+unknown token as it is), so clients without the mod read it too. The secret routes are untouched: the
+frog's `iscDeepVoidPortal` after Mithrix, Solus Wing's Mainline Portal (Computational Exchange, then Neural
+Sanctum), and Soulbound Threshold's `PortalToUltima` (Veil of Memory, Terminal Lucidity, Echo of
+Providence), which needs Reincarnation in its `CursedBookSacrificeZone`.
+
+The Shrine of Descent (`ShrineCatastropheBehavior`) is DLC4's major catastrophe. It appears once the team
+holds enough Pages; praying sets `DLC4CatastropheProvider.EnableMajorCatastrophe`, and the next teleporter
+event runs DLC4's states: charge to 100%, `OverchargingInterludeState`, `OverchargingState` (`maxCharge`
+6.67, 35 s, an extra boss bought with max(its override cost, 600 × √difficulty) × (1 + 0.1 per Mountain
+and hex stack)), whose `OnExit` spawns `iscChampRushPortal` to `champrush`, then DLC4's `ChargedState`,
+which outside Conduit Canyon disables the teleporter and places
+`CursedBookSacrificeZone_TeleporterNextStage_Variant` (Reincarnation on to the next stage). With Final
+Stage / Shrine of Descent keeps the teleporter, `OverchargingState.portalSpawnCard` is cleared before
+`OnExit`, and `EntityStateMachine.SetNextState` swaps DLC4's `ChargedState` for
+`TeleporterInteraction.ChargedState`, which it extends, firing its `SurviveMajorCatastrophe` karma event
+itself. That runs on the server, whose networked state machine sends clients the plain state.
+
+To test the final stages, Debug / Start at stage 5 ([DebugStageFive.cs](../EclipseAllMaps/DebugStageFive.cs),
+off by default, left out of the README and CHANGELOG): `EclipseStagePool` swaps any stage 1 pool (the run's
+start, and each loop) for the `stageOrder` 5 stage scenes before filtering it as usual, so Void Locus joins
+and the checkboxes apply (Only added maps doesn't, so the whole stage 5 pool is tested). On
+`Run.onRunStartGlobal` (after `Run.Start` has begun the first loop) `stageClearCount` is set to 4, as on a real
+stage 5: at 0 the boss credits (600 × √difficulty) bought no stage 5 boss, which cost 800 and more, so the
+teleporter event had none. The teleporter is charged as usual (a charged state set from the start could not
+be used). On `Run.onPlayerFirstCreatedServer` each player's master gets 20 Mochas (`DLC1Content.Items.AttackSpeedAndMoveSpeed`),
+20 Hopoo Feathers, 10 Focused Convergences and `godMode`, which `UpdateBodyGodMode` copies to every body it spawns. Leaving the stage 5 begins a
+loop, so the next stage is a final stage (`stageClearCount` 5, none cleared in the loop).
 
 ## Teleporter bosses
 
@@ -269,12 +363,17 @@ boss is already forced, it picks:
 - Robot bosses, on Conduit Canyon: Solus Control Unit, Alloy Worship Unit, Solus Amalgamator or Alloy
   Hunter, `rng.RangeInt(0, 4)`. The unit and the Amalgamator go in as ordinary boss cards
   (`OverrideNextBossCard`, not singular): as many as the credits buy, elite when they stretch to it.
-- Alloy Hunter as a normal boss, from stage 4 (`stageClearCount` >= 3) on any map, Conduit Canyon too
+- Void Locus / Void bosses, on Void Locus: one of `cscVoidMegaCrab` (its own pool's only champion, which on
+  the first loop got half the champion weight next to Sky Meadow's), `cscImpBoss`, `cscMegaConstruct` (DLC1),
+  `cscVagrant` or `cscGrandparent`, each as likely among those available whose cost (800; the Grandparent
+  1150) the boss credits cover, as an ordinary boss card; with none, the stage's own pick stands.
+- Alloy Hunter as a normal boss, from stage 4 (`stageClearCount` >= 3) on any other map, Conduit Canyon too
   with Robot bosses off: the Alloy Hunter at 1 in (bosses + 1), counting bosses as vanilla does
   (available champions not `forbiddenAsBoss`). Not on a stage without any, such as Void Locus's Lunar
   family event, where it would be certain.
 
-Neither under the Artifact of Kin, which keeps a stage to one monster type. Both need DLC3.
+None under the Artifact of Kin, which keeps a stage to one monster type. The robot bosses and the Alloy
+Hunter need DLC3.
 
 Robot bosses on stage 4 (body stats; damage coefficients from the entity state configurations):
 

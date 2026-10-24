@@ -1,13 +1,11 @@
 using RoR2;
-using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 
 namespace EclipseAllMaps
 {
     /// <summary>
-    /// Keeps the run on the stage rotation by closing the portals down the two DLC paths, and moves their
-    /// endings to Commencement's frog, the way vanilla reaches the Planetarium.
+    /// Keeps the run on the stage rotation by closing the portals down the two DLC paths. Their final bosses
+    /// are among the final stages instead (see <see cref="FinalStage"/>).
     ///
     /// Colossus path (green portals, <c>iscColossusPortal</c>): every vanilla teleporter carries one for Reformed
     /// Altar and Treeborn Colony (Golden Dieback), a Halcyon Shrine opens one on stages 1-3 of the other maps once
@@ -19,32 +17,15 @@ namespace EclipseAllMaps
     /// teleporter's portal to Solutional Haunt, lighting an orb on it. On a run's third stage the access codes
     /// arm a portal to Conduit Canyon instead, which is a stage 4 of the rotation, and after Solus Wing one to
     /// Computational Exchange, a hidden realm that returns to the rotation.
-    ///
-    /// After Mithrix, petting the frog 10 times opens vanilla's purple portal to the Planetarium (Voidling);
-    /// here it also opens a green one to Prime Meridian (False Son) and one to Neural Sanctum (Solus Heart).
     /// </summary>
     internal static class AlternatePathPortals
     {
-        private const string PrimeMeridian = "meridian";
-        private const string NeuralSanctum = "solusweb";
         private const string ConduitCanyon = "conduitcanyon";
 
         private const string ColossusPortalCard = "iscColossusPortal";
-        private const string ColossusPortalAddress = "RoR2/DLC2/iscColossusPortal.asset";
 
         private const string SolutionalHauntPortalCard = "iscHardwareProgPortal_Haunt";
         private const string ConduitCanyonPortalCard = "iscHardwareProgPortal";
-
-        /// <summary>The portal Computational Exchange's Solus vendor opens to Neural Sanctum.</summary>
-        private const string NeuralSanctumPortalAddress = "RoR2/DLC3/SolusWebPortal.prefab";
-
-        /// <summary>Set once False Son is beaten; vanilla opens no more Colossus portals after it.</summary>
-        private const string FalseSonBeatenFlag = "FalseSonBossComplete";
-
-        private const string SolusHeartBeatenFlag = "SolusHeartBeaten";
-
-        /// <summary>The green portal's card with Neural Sanctum's portal as its prefab, to place it the same way.</summary>
-        private static InteractableSpawnCard neuralSanctumPortalCard;
 
         internal static void Init()
         {
@@ -87,26 +68,6 @@ namespace EclipseAllMaps
 
                 orig(self, newValue);
             };
-
-            // Commencement's frog shows up for the escape after Mithrix; at maxPets it opens the void portal.
-            On.RoR2.FrogController.Pet += (orig, self, interactor) =>
-            {
-                orig(self, interactor);
-
-                if (NetworkServer.active && self.petCount == self.maxPets && EclipseStagePool.IsActive(Run.instance))
-                {
-                    Vector3 position = self.transform.position;
-                    if (ModSettings.FrogPortalToPrimeMeridian.Value)
-                    {
-                        OpenPrimeMeridianPortal(position);
-                    }
-
-                    if (ModSettings.FrogPortalToNeuralSanctum.Value)
-                    {
-                        OpenNeuralSanctumPortal(position);
-                    }
-                }
-            };
         }
 
         /// <summary>
@@ -146,95 +107,6 @@ namespace EclipseAllMaps
                 default:
                     return false;
             }
-        }
-
-        /// <summary>
-        /// Opens a green Colossus portal to Prime Meridian near <paramref name="position"/>, unless the run
-        /// lacks DLC2 or has beaten False Son already.
-        /// </summary>
-        private static void OpenPrimeMeridianPortal(Vector3 position)
-        {
-            Run run = Run.instance;
-            SceneDef primeMeridian = SceneCatalog.FindSceneDef(PrimeMeridian);
-            if (!primeMeridian || !run.CanPickStage(primeMeridian) || run.GetEventFlag(FalseSonBeatenFlag))
-            {
-                return;
-            }
-
-            GameObject portal = SpawnPortal(Addressables.LoadAssetAsync<SpawnCard>(ColossusPortalAddress).WaitForCompletion(), position);
-            if (!portal)
-            {
-                Log.Warning("Could not place the portal to Prime Meridian.");
-                return;
-            }
-
-            // It would get there anyway (no tier matches Commencement, so it falls back to its own
-            // destination), but not by design; this pins it.
-            if (portal.TryGetComponent(out SceneExitController exit))
-            {
-                exit.isAlternatePath = false;
-                exit.useRunNextStageScene = false;
-                exit.destinationScene = primeMeridian;
-            }
-
-            Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = "PORTAL_STORM_OPEN" });
-            Log.Info("Commencement: the frog opened a portal to Prime Meridian.");
-        }
-
-        /// <summary>
-        /// Opens vanilla's portal to Neural Sanctum (it leads nowhere else) near <paramref name="position"/>,
-        /// unless the run lacks DLC3 or has beaten Solus Heart already.
-        /// </summary>
-        private static void OpenNeuralSanctumPortal(Vector3 position)
-        {
-            Run run = Run.instance;
-            SceneDef neuralSanctum = SceneCatalog.FindSceneDef(NeuralSanctum);
-            if (!neuralSanctum || !run.CanPickStage(neuralSanctum) || run.GetEventFlag(SolusHeartBeatenFlag))
-            {
-                return;
-            }
-
-            if (!neuralSanctumPortalCard)
-            {
-                var colossusPortal = Addressables.LoadAssetAsync<InteractableSpawnCard>(ColossusPortalAddress).WaitForCompletion();
-                GameObject prefab = Addressables.LoadAssetAsync<GameObject>(NeuralSanctumPortalAddress).WaitForCompletion();
-                if (!colossusPortal || !prefab)
-                {
-                    Log.Warning("The portal to Neural Sanctum is missing.");
-                    return;
-                }
-
-                neuralSanctumPortalCard = Object.Instantiate(colossusPortal);
-                neuralSanctumPortalCard.name = "iscNeuralSanctumPortal";
-                neuralSanctumPortalCard.prefab = prefab;
-            }
-
-            if (!SpawnPortal(neuralSanctumPortalCard, position))
-            {
-                Log.Warning("Could not place the portal to Neural Sanctum.");
-                return;
-            }
-
-            Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = "PORTAL_SOLUSSHOP_OPEN" });
-            Log.Info("Commencement: the frog opened a portal to Neural Sanctum.");
-        }
-
-        /// <summary>Places a portal 10-40 m from <paramref name="position"/>, like the frog's void portal.</summary>
-        private static GameObject SpawnPortal(SpawnCard portalCard, Vector3 position)
-        {
-            if (!portalCard)
-            {
-                return null;
-            }
-
-            var placement = new DirectorPlacementRule
-            {
-                placementMode = DirectorPlacementRule.PlacementMode.Approximate,
-                minDistance = 10f,
-                maxDistance = 40f,
-                position = position,
-            };
-            return DirectorCore.instance.TrySpawnObject(new DirectorSpawnRequest(portalCard, placement, new Xoroshiro128Plus(Run.instance.stageRng.nextUlong)));
         }
     }
 }
