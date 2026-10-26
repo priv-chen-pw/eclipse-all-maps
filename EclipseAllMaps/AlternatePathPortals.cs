@@ -33,7 +33,7 @@ namespace EclipseAllMaps
             On.RoR2.PortalSpawner.Start += (orig, self) =>
             {
                 if (NetworkServer.active && self.portalSpawnCard && self.portalSpawnCard.name == ColossusPortalCard
-                    && ModSettings.NoColossusPortals.Value && IsClosedColossusPortal(self, out string source))
+                    && IsClosedColossusPortal(self, out string source))
                 {
                     self.spawnChance = -1f;
                     Log.Info($"{SceneCatalog.mostRecentSceneDef.cachedName}: no green Colossus portal from the {source}.");
@@ -46,7 +46,7 @@ namespace EclipseAllMaps
             // stage is 2-4.
             On.EntityStates.Missions.Goldshores.Exit.IsValidStormTier += (orig, self) =>
             {
-                if (ModSettings.NoColossusPortals.Value && EclipseStagePool.IsActive(Run.instance))
+                if (EclipseStagePool.IsActive(Run.instance))
                 {
                     Log.Info("Gilded Coast: no green Colossus portal.");
                     return false;
@@ -93,7 +93,7 @@ namespace EclipseAllMaps
         /// </summary>
         private static bool IsClosedAlloyedPortal(PortalSpawner spawner)
         {
-            if (!ModSettings.NoSolutionalHauntPortals.Value || !spawner.PortalSpawnCard || !EclipseStagePool.IsActive(Run.instance))
+            if (!spawner.PortalSpawnCard || !EclipseStagePool.IsActive(Run.instance))
             {
                 return false;
             }

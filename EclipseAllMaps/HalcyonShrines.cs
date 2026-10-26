@@ -101,7 +101,7 @@ namespace EclipseAllMaps
         }
 
         private static bool IsWeakened() =>
-            ModSettings.WeakerHalcyonShrines.Value && EclipseStagePool.IsActive(Run.instance) && Run.instance.stageClearCount >= Stage4ClearCount;
+            EclipseStagePool.IsActive(Run.instance) && Run.instance.stageClearCount >= Stage4ClearCount;
 
         private static DirectorCard NewCard(string address, int weight) => new DirectorCard
         {

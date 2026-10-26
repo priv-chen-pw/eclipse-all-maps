@@ -15,7 +15,7 @@ namespace EclipseAllMaps
     /// - Conduit Canyon's teleporter, placed in the scene, is wired to Solutional Haunt (the Alloyed path).
     ///   It goes to the run's next stage instead, picked from the stage 5 pool like any stage 4 map's.
     ///
-    /// Each has its own setting, and applies only where the mod does and that map is switched on. The green
+    /// Each applies only where the mod does and that map is switched on. The green
     /// Colossus portals Reformed Altar and Treeborn Colony open are closed in <see cref="AlternatePathPortals"/>.
     /// </summary>
     internal static class AddedMapProgression
@@ -79,7 +79,7 @@ namespace EclipseAllMaps
             {
                 orig(self);
 
-                if (NetworkServer.active && ModSettings.ConduitCanyonToStage5.Value && IsChanged(ConduitCanyon))
+                if (NetworkServer.active && IsChanged(ConduitCanyon))
                 {
                     self.sceneExitController.useRunNextStageScene = true;
                     Log.Info($"Conduit Canyon: the teleporter leads to {Run.instance.nextStageScene?.cachedName} instead of the Alloyed path.");
@@ -109,6 +109,6 @@ namespace EclipseAllMaps
         /// Whether this is Void Locus getting a Primordial Teleporter instead of its signals. Its teleporter,
         /// battery count and borrowed destinations all go by this.
         /// </summary>
-        private static bool VoidLocusGetsTeleporter() => ModSettings.VoidLocusTeleporter.Value && IsChanged(VoidLocus);
+        private static bool VoidLocusGetsTeleporter() => IsChanged(VoidLocus);
     }
 }

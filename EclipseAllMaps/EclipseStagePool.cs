@@ -83,7 +83,7 @@ namespace EclipseAllMaps
         }
 
         /// <summary>
-        /// Whether the mod is on for <paramref name="run"/>: an Eclipse run (or a normal one, if set) with
+        /// Whether the mod is on for <paramref name="run"/>: an Eclipse run with
         /// <see cref="ModSettings.AddAllMaps"/> on.
         /// </summary>
         internal static bool IsActive(Run run) => ModSettings.AppliesTo(run) && ModSettings.AddAllMaps.Value;
@@ -102,7 +102,7 @@ namespace EclipseAllMaps
                 return;
             }
 
-            DebugStageFive.ReplaceStageOne(run, choices);
+            DebugStart.ReplaceStageOne(run, choices);
 
             // A pool only ever holds one stage's maps, so any entry tells which stage is being picked.
             int stage = choices.GetChoice(0).value.stageOrder;

@@ -72,8 +72,7 @@ namespace EclipseAllMaps
         private static bool IsFirstLoopVoidLocus() =>
             AddedMaps.InPlay() != null
             && SceneCatalog.mostRecentSceneDef.cachedName == VoidLocus
-            && Run.instance.stageClearCount < VanillaVoidLocusMinStagesCleared
-            && ModSettings.VoidLocusMonsters.Value;
+            && Run.instance.stageClearCount < VanillaVoidLocusMinStagesCleared;
 
         /// <summary>The first-loop selection, or null (keeping the vanilla pool) if Sky Meadow's is missing.</summary>
         private static DirectorCardCategorySelection FirstLoopVoidLocusMonsters(ClassicStageInfo stageInfo)

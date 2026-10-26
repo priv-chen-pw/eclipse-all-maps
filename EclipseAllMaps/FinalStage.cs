@@ -20,7 +20,7 @@ namespace EclipseAllMaps
     /// - End or loop: each final boss leaves a win and a way on to stage 1, side by side. Commencement's escape and
     ///   the Planetarium's exit end the run, so they get a Destination Portal to stage 1. Solutional Haunt's
     ///   Primordial Teleporter loops, and Prime Meridian's and Soulbound Threshold's portals lead to the next stage,
-    ///   so they get a Celestial Portal that ends the run: Solutional Haunt always (vanilla has no ending after
+    ///   so they get an altar that ends the run (EndAltar): Solutional Haunt always (vanilla has no ending after
     ///   Solus Wing), the other two in Eclipse, which hides the Shrine of Rebirth and turns off the sacrifice ending.
     /// - Weaker Soulbound Threshold: as the final stage its monsters (challenge waves, the champions the
     ///   Harvester feeds on) have 60% health and both of the Anima Harvester's phases 80%.
@@ -52,9 +52,6 @@ namespace EclipseAllMaps
         /// <summary>Prime Meridian's portal on after False Son; it leads to the run's next stage.</summary>
         private const string LoopPortalAddress = "RoR2/DLC2/iscDestinationPortal.asset";
 
-        /// <summary>The Celestial Portal, the one that leads to the Obelisk that ends a run in A Moment, Fractured.</summary>
-        private const string EndPortalAddress = "RoR2/Base/PortalMS/iscMSPortal.asset";
-
         /// <summary>How far from a vanilla exit the mod's own one goes: clear of it, but beside it.</summary>
         private const float BesideMin = 10f;
         private const float BesideMax = 18f;
@@ -67,11 +64,10 @@ namespace EclipseAllMaps
         private const int SoulboundThresholdMonsterHealthPercent = 60;
 
         private static SpawnCard loopPortalCard;
-        private static SpawnCard endPortalCard;
 
-        /// <summary>This stage's Celestial Portal, if it has one, and the ending it gives.</summary>
-        private static SceneExitController endPortal;
-        private static GameEndingDef endPortalEnding;
+        /// <summary>The exit this stage's end altar begins, if it has one, and the ending it gives.</summary>
+        private static SceneExitController endExit;
+        private static GameEndingDef endExitEnding;
 
         /// <summary>The final stage reached last, which starts no new round of them. Only read once this run has
         /// reached every final stage, so after this run has set it.</summary>
@@ -84,7 +80,7 @@ namespace EclipseAllMaps
                 orig(self);
 
                 SceneExitController exit = self.sceneExitController;
-                if (NetworkServer.active && ModSettings.RandomFinalStage.Value && EclipseStagePool.IsActive(Run.instance)
+                if (NetworkServer.active && EclipseStagePool.IsActive(Run.instance)
                     && exit && exit.destinationScene && exit.destinationScene.cachedName == Commencement && OnStageFive())
                 {
                     PickFinalStage(exit);
@@ -97,7 +93,7 @@ namespace EclipseAllMaps
                 orig(self);
 
                 SceneDef destination = self.teleporterInteraction ? self.teleporterInteraction.sceneExitController.destinationScene : null;
-                if (NetworkServer.active && destination && ModSettings.RandomFinalStage.Value && EclipseStagePool.IsActive(Run.instance) && OnStageFive())
+                if (NetworkServer.active && destination && EclipseStagePool.IsActive(Run.instance) && OnStageFive())
                 {
                     foreach ((string scene, string omen) in FinalStages)
                     {
@@ -116,7 +112,7 @@ namespace EclipseAllMaps
             {
                 orig(self);
 
-                if (NetworkServer.active && ExitsApply())
+                if (NetworkServer.active && EclipseStagePool.IsActive(Run.instance))
                 {
                     Transform frog = self.transform.Find("EscapeSequenceObjects/FrogSpawner");
                     OpenLoopPortal((frog ? frog : self.transform).position);
@@ -128,7 +124,7 @@ namespace EclipseAllMaps
             {
                 orig(self);
 
-                if (NetworkServer.active && ExitsApply() && self.currentDonut?.returnPoint)
+                if (NetworkServer.active && EclipseStagePool.IsActive(Run.instance) && self.currentDonut?.returnPoint)
                 {
                     OpenLoopPortal(ExitPosition(exit => exit.destinationScene && exit.destinationScene.cachedName == "voidoutro",
                         self.currentDonut.returnPoint.position));
@@ -140,11 +136,11 @@ namespace EclipseAllMaps
             {
                 orig(self);
 
-                if (NetworkServer.active && self.isEclipse && ExitsApply() && IsFinalStage())
+                if (NetworkServer.active && self.isEclipse && EclipseStagePool.IsActive(Run.instance) && IsFinalStage())
                 {
                     // Its Destination Portal spawns at portalObject.
                     GameObject portalSpot = self._shrineController.portalObject;
-                    OpenEndPortal((portalSpot ? portalSpot.transform : self.transform).position, DLC2Content.GameEndings.RebirthEndingDef,
+                    OpenEndAltar((portalSpot ? portalSpot.transform : self.transform).position, DLC2Content.GameEndings.RebirthEndingDef,
                         "The storm falls silent..");
                 }
             };
@@ -156,9 +152,9 @@ namespace EclipseAllMaps
                 orig(self);
 
                 if (NetworkServer.active && self.reaperSpawned && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse1
-                    && ExitsApply() && IsFinalStage())
+                    && EclipseStagePool.IsActive(Run.instance) && IsFinalStage())
                 {
-                    OpenEndPortal(ExitPosition(exit => exit.name.StartsWith("ChampRushExitPortal"), self.transform.position),
+                    OpenEndAltar(ExitPosition(exit => exit.name.StartsWith("ChampRushExitPortal"), self.transform.position),
                         DLC4Content.GameEndings.CRSacrificeEndingGood, "The scales are balanced..");
                 }
             };
@@ -169,21 +165,21 @@ namespace EclipseAllMaps
             {
                 orig(self);
 
-                if (NetworkServer.active && ExitsApply() && IsFinalStage())
+                if (NetworkServer.active && EclipseStagePool.IsActive(Run.instance) && IsFinalStage())
                 {
-                    OpenEndPortal((self.exitPortal ? self.exitPortal.transform : self.transform).position, DLC3Content.GameEndings.DecompileEnding,
+                    OpenEndAltar((self.exitPortal ? self.exitPortal.transform : self.transform).position, DLC3Content.GameEndings.DecompileEnding,
                         "Connection terminated..");
                 }
             };
 
-            // The run ends as soon as a player enters, and the portal still teleports everyone out: the Rebirth
+            // The run ends as soon as a player uses the altar, and its exit still teleports everyone out: the Rebirth
             // ending waits for that before fading out. Once the game is over the exit loads no stage.
             On.RoR2.SceneExitController.Begin += (orig, self) =>
             {
-                if (NetworkServer.active && self == endPortal && endPortalEnding && self.exitState == SceneExitController.ExitState.Idle)
+                if (NetworkServer.active && self == endExit && endExitEnding && self.exitState == SceneExitController.ExitState.Idle)
                 {
-                    Log.Info($"The Celestial Portal ends the run: {endPortalEnding.cachedName}.");
-                    Run.instance.BeginGameOver(endPortalEnding);
+                    Log.Info($"The end altar ends the run: {endExitEnding.cachedName}.");
+                    Run.instance.BeginGameOver(endExitEnding);
                 }
 
                 orig(self);
@@ -195,7 +191,7 @@ namespace EclipseAllMaps
             CharacterBody.onBodyStartGlobal += body =>
             {
                 if (NetworkServer.active && body.teamComponent.teamIndex == TeamIndex.Monster && body.inventory
-                    && ModSettings.WeakerSoulboundThreshold.Value && EclipseStagePool.IsActive(Run.instance)
+                    && EclipseStagePool.IsActive(Run.instance)
                     && SceneCatalog.mostRecentSceneDef.cachedName == SoulboundThreshold && IsFinalStage()
                     && body.inventory.GetItemCountPermanent(RoR2Content.Items.PercentMaxHealth) == 0)
                 {
@@ -212,7 +208,7 @@ namespace EclipseAllMaps
             // The major catastrophe overcharges the teleporter to 666%; leaving that state opens the Ritual Portal.
             On.EntityStates.TeleporterCatastrophe.DLC4.Teleporter.OverchargingState.OnExit += (orig, self) =>
             {
-                if (NetworkServer.active && ShrineOfDescentKeepsTeleporter())
+                if (NetworkServer.active && EclipseStagePool.IsActive(Run.instance))
                 {
                     self.portalSpawnCard = null;
                     Log.Info("Shrine of Descent: no Ritual Portal to Soulbound Threshold.");
@@ -227,7 +223,7 @@ namespace EclipseAllMaps
             On.RoR2.EntityStateMachine.SetNextState += (orig, self, newNextState) =>
             {
                 if (newNextState is EntityStates.TeleporterCatastrophe.DLC4.Teleporter.ChargedState && NetworkServer.active
-                    && ShrineOfDescentKeepsTeleporter())
+                    && EclipseStagePool.IsActive(Run.instance))
                 {
                     Util.KarmaEventTrigger("SurviveMajorCatastrophe");
                     newNextState = new TeleporterInteraction.ChargedState();
@@ -237,11 +233,6 @@ namespace EclipseAllMaps
                 orig(self, newNextState);
             };
         }
-
-        private static bool ExitsApply() => ModSettings.EndOrLoopAfterFinalBoss.Value && EclipseStagePool.IsActive(Run.instance);
-
-        private static bool ShrineOfDescentKeepsTeleporter() =>
-            ModSettings.ShrineOfDescentKeepsTeleporter.Value && EclipseStagePool.IsActive(Run.instance);
 
         /// <summary>A stage 5 of the rotation: stageOrder 5, or Void Locus in play, which is filed under 99.</summary>
         internal static bool OnStageFive() =>
@@ -337,25 +328,25 @@ namespace EclipseAllMaps
         }
 
         /// <summary>
-        /// Opens a Celestial Portal beside <paramref name="position"/> that ends the run with <paramref name="ending"/>,
+        /// Raises the end altar beside <paramref name="position"/>, which ends the run with <paramref name="ending"/>,
         /// announced in the game's own world-event style after <paramref name="aftermath"/>, a line on the fallen boss.
         /// </summary>
-        private static void OpenEndPortal(Vector3 position, GameEndingDef ending, string aftermath)
+        private static void OpenEndAltar(Vector3 position, GameEndingDef ending, string aftermath)
         {
-            endPortalCard ??= Addressables.LoadAssetAsync<SpawnCard>(EndPortalAddress).WaitForCompletion();
-            GameObject portal = SpawnBeside(endPortalCard, position);
-            if (!ending || !portal || !portal.TryGetComponent(out endPortal))
+            GameObject altar = SpawnBeside(EndAltar.SpawnCard, position);
+            if (!ending || !altar)
             {
-                Log.Warning("Could not place the Celestial Portal that ends the run.");
+                Log.Warning("Could not place the altar that ends the run.");
                 return;
             }
 
-            endPortalEnding = ending;
+            endExit = EndAltar.SetUp(altar);
+            endExitEnding = ending;
             Chat.SendBroadcastChat(new Chat.SimpleChatMessage
             {
-                baseToken = $"<style=cWorldEvent>{aftermath} A celestial portal appears.. step through, and let your journey end.</style>",
+                baseToken = $"<style=cWorldEvent>{aftermath} An altar rises.. touch it, and let your journey end.</style>",
             });
-            Log.Info($"{SceneCatalog.mostRecentSceneDef.cachedName}: a Celestial Portal that ends the run ({ending.cachedName}).");
+            Log.Info($"{SceneCatalog.mostRecentSceneDef.cachedName}: an altar that ends the run ({ending.cachedName}).");
         }
 
         /// <summary>

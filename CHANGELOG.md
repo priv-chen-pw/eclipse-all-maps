@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.0
+
+* **After the final boss:** the run ends at a new stone altar with the Eclipse emblem, under the beam a Soul Conduit gets when a Wake succeeds, instead of a Celestial Portal. Players without the mod see it as a Shrine of Order.
+* **Settings:** cut from about 60 to 13. Kept: the switch for the whole mod, Added map chance, a checkbox per new map and per final boss, Halcyon Shrine on every stage, and Alloy Hunter as a normal boss. Everything else always applies: switched off, it could break a run (portals off the rotation reopened, final bosses left without a win) or only undid the balancing. Also gone: the checkboxes for vanilla maps, and Also in normal runs (the mod is for Eclipse only). The map checkboxes moved to a Maps section and the two extras to General, so they are back on.
+* **README:** shorter, with a TL;DR on top.
+
 ## 2.0.0
 
 * **Final stage:** the stage 5 Primordial Teleporter, aligned with the moon, leads to a random final stage: Commencement (Mithrix), the Planetarium (Voidling), Prime Meridian (False Son), Solutional Haunt (Solus Wing) or Soulbound Threshold (Anima Harvester). Chat drops a cryptic hint about which one, and none comes twice until the run has had them all. New settings section: Final Stage, with a checkbox per final stage.

@@ -50,7 +50,7 @@ namespace EclipseAllMaps
         {
             AddedMap addedMap = AddedMaps.InPlay();
             ClassicStageInfo stageInfo = SceneInfo.instance ? SceneInfo.instance.GetComponent<ClassicStageInfo>() : null;
-            if (addedMap == null || !stageInfo || !ModSettings.BalanceCredits.Value)
+            if (addedMap == null || !stageInfo)
             {
                 return;
             }

@@ -8,8 +8,8 @@ namespace EclipseAllMaps
     /// Picks the teleporter boss where the mod changes it.
     ///
     /// - Conduit Canyon's teleporter event is scripted by its <c>VultureFightOverride</c>: the boss is always a
-    ///   Solus Control Unit, and at 75% health an Alloy Hunter kills it and takes over. With either setting below
-    ///   the script is off and the stage has one boss fight.
+    ///   Solus Control Unit, and at 75% health an Alloy Hunter kills it and takes over. The script is off, and
+    ///   the stage has one boss fight.
     /// - Robot bosses: Conduit Canyon's boss is a Solus Control Unit, Alloy Worship Unit, Solus Amalgamator or
     ///   Alloy Hunter, each as likely. The first and third are ordinary 800-credit bosses on stage 4 maps
     ///   already; the other two come as <see cref="SoloBoss"/>es.
@@ -60,7 +60,7 @@ namespace EclipseAllMaps
 
             On.RoR2.VultureFightOverride.Start += (orig, self) =>
             {
-                if (NetworkServer.active && OnConduitCanyon() && (ModSettings.AlloyHunterBoss.Value || ModSettings.RobotBosses.Value))
+                if (NetworkServer.active && OnConduitCanyon())
                 {
                     self.triggerOnStart = false;
 
@@ -96,11 +96,11 @@ namespace EclipseAllMaps
 
         private static void PickBoss(CombatDirector bossDirector, TeleporterInteraction teleporter)
         {
-            if (ModSettings.RobotBosses.Value && OnConduitCanyon())
+            if (OnConduitCanyon())
             {
                 PickRobotBoss(bossDirector, teleporter);
             }
-            else if (ModSettings.VoidLocusBosses.Value && AddedMaps.InPlay()?.SceneName == VoidLocus)
+            else if (AddedMaps.InPlay()?.SceneName == VoidLocus)
             {
                 PickVoidLocusBoss(bossDirector);
             }

@@ -34,7 +34,7 @@ namespace EclipseAllMaps
             {
                 orig(self, forcedMonsterCategory, forcedInteractableCategory);
 
-                if (forcedInteractableCategory || !NetworkServer.active || !ModSettings.VoidLocusInteractables.Value || AddedMaps.InPlay()?.SceneName != VoidLocus)
+                if (forcedInteractableCategory || !NetworkServer.active || AddedMaps.InPlay()?.SceneName != VoidLocus)
                 {
                     return;
                 }
