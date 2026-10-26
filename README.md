@@ -22,6 +22,14 @@
 
 Each gets its stage's chest and monster budget.
 
+### The altar
+
+
+<img width="480" height="364" alt="new_altar" src="https://github.com/user-attachments/assets/f99e467d-2131-4dd3-bb95-618dbdc91370" />
+
+
+A stone altar with the Eclipse emblem, under a victory beam, beside the arena's exit. It only appears on your final stage. Use it to win the run with that boss's ending. Players without the mod see a Shrine of Order.
+
 ### Final boss
 
 The stage 5 teleporter, aligned with the moon, picks one of five final bosses, with no repeats until you have seen all five. Chat hints at the pick. Shift Destination still loops.
@@ -35,12 +43,6 @@ The stage 5 teleporter, aligned with the moon, picks one of five final bosses, w
 | ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/boss-anima-harvester.png) Anima Harvester | ![](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/map-soulbound-threshold.jpg) Soulbound Threshold | *Scales, tipped askew* | New altar | Its portal |
 
 On Soulbound Threshold monsters have 60% health and the Anima Harvester 80%. The Shrine of Descent no longer breaks the teleporter. Secret bosses work as before.
-
-### The altar
-
-<!-- Altar GIF goes here, e.g. ![The altar](https://raw.githubusercontent.com/priv-chen-pw/eclipse-all-maps/main/docs/images/altar.gif) -->
-
-A stone altar with the Eclipse emblem, under a victory beam, beside the arena's exit. It only appears on your final stage. Use it to win the run with that boss's ending. Players without the mod see a Shrine of Order.
 
 ### Other changes
 
