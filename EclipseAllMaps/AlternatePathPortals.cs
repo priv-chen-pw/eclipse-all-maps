@@ -13,22 +13,36 @@ namespace EclipseAllMaps
     /// opens one when the next stage is 2-4. Each leads to the path's map for the next stage number, from tier 4
     /// to Prime Meridian.
     ///
-    /// Alloyed path: solving a map's access codes (<c>SolusFight</c>) or Siren's Call's event arms the
-    /// teleporter's portal to Solutional Haunt, lighting an orb on it. On a run's third stage the access codes
-    /// arm a portal to Conduit Canyon instead, which is a stage 4 of the rotation, and after Solus Wing one to
-    /// Computational Exchange, a hidden realm that returns to the rotation.
+    /// Alloyed path: no access nodes spawn, so their codes never start the fight that arms a portal. Siren's
+    /// Call's event still arms the teleporter's portal to Solutional Haunt, lighting an orb on it, which stays
+    /// shut; after Solus Wing it arms one to Computational Exchange instead, a hidden realm that returns to the
+    /// rotation.
     /// </summary>
     internal static class AlternatePathPortals
     {
-        private const string ConduitCanyon = "conduitcanyon";
-
         private const string ColossusPortalCard = "iscColossusPortal";
 
         private const string SolutionalHauntPortalCard = "iscHardwareProgPortal_Haunt";
-        private const string ConduitCanyonPortalCard = "iscHardwareProgPortal";
 
         internal static void Init()
         {
+            // Places and switches on the access nodes; as with the Alloyed Collective off, they stay off instead.
+            On.RoR2.AccessCodesMissionController.OnStartServer += (orig, self) =>
+            {
+                if (!EclipseStagePool.IsActive(Run.instance))
+                {
+                    orig(self);
+                    return;
+                }
+
+                foreach (AccessCodesNodeData data in self.nodes)
+                {
+                    data.node.SetActive(false);
+                }
+
+                Log.Info($"{SceneCatalog.mostRecentSceneDef.cachedName}: no access nodes.");
+            };
+
             // Start rolls the portal against spawnChance, and turns on its preview orb if it will spawn.
             On.RoR2.PortalSpawner.Start += (orig, self) =>
             {
@@ -87,26 +101,9 @@ namespace EclipseAllMaps
             return EclipseStagePool.IsActive(Run.instance);
         }
 
-        /// <summary>
-        /// Whether a portal spawner leads off the rotation down the Alloyed path: Solutional Haunt's always, and
-        /// Conduit Canyon's when Conduit Canyon is switched off, since then it is vanilla's and leads on there.
-        /// </summary>
-        private static bool IsClosedAlloyedPortal(PortalSpawner spawner)
-        {
-            if (!spawner.PortalSpawnCard || !EclipseStagePool.IsActive(Run.instance))
-            {
-                return false;
-            }
-
-            switch (spawner.PortalSpawnCard.name)
-            {
-                case SolutionalHauntPortalCard:
-                    return true;
-                case ConduitCanyonPortalCard:
-                    return !StageMaps.IsEnabled(ConduitCanyon);
-                default:
-                    return false;
-            }
-        }
+        /// <summary>Whether a portal spawner leads off the rotation down the Alloyed path: Solutional Haunt's.</summary>
+        private static bool IsClosedAlloyedPortal(PortalSpawner spawner) =>
+            spawner.PortalSpawnCard && spawner.PortalSpawnCard.name == SolutionalHauntPortalCard
+            && EclipseStagePool.IsActive(Run.instance);
     }
 }

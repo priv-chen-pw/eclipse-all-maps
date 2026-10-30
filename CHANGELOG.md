@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0
+
+* **Access nodes:** no longer appear, so there is no access-code fight, its extra item or its portal to Conduit Canyon on stage 3. Conduit Canyon stays in the stage 4 rotation.
+* **Shrine of Descent:** fixed the teleporter staying unusable after its 666% charge and the extra boss.
+
 ## 2.1.0
 
 * **After the final boss:** the run ends at a new stone altar with the Eclipse emblem, under the beam a Soul Conduit gets when a Wake succeeds, instead of a Celestial Portal. Players without the mod see it as a Shrine of Order.

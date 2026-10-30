@@ -46,7 +46,7 @@ On Soulbound Threshold monsters have 60% health and the Anima Harvester 80%. The
 
 ### Other changes
 
-* No green portals and no portals to Solutional Haunt. Access codes still give their extra boss and item.
+* No green portals, no portals to Solutional Haunt and no access nodes.
 * Halcyon Shrines can spawn on every stage, weaker from stage 4.
 * From stage 4 the Alloy Hunter can be a teleporter boss: one, plus one per Shrine of the Mountain.
 

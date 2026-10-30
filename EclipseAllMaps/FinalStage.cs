@@ -218,15 +218,17 @@ namespace EclipseAllMaps
             };
 
             // Then comes DLC4's charged state, which outside Conduit Canyon shuts the teleporter and places a
-            // Reincarnation zone instead. The plain charged state it extends takes its place, with its karma event.
-            // Swapped on the server, so clients without the mod get the plain state too.
+            // Reincarnation zone instead. A plain charged state takes its place, with its karma event. The plain
+            // one waits for monstersCleared, which only vanilla's charging state updates and DLC4's replace, so
+            // it would never open: the always-interactable one doesn't wait (the extra boss is dead by now).
+            // Swapped on the server, so clients without the mod get it too.
             On.RoR2.EntityStateMachine.SetNextState += (orig, self, newNextState) =>
             {
                 if (newNextState is EntityStates.TeleporterCatastrophe.DLC4.Teleporter.ChargedState && NetworkServer.active
                     && EclipseStagePool.IsActive(Run.instance))
                 {
                     Util.KarmaEventTrigger("SurviveMajorCatastrophe");
-                    newNextState = new TeleporterInteraction.ChargedState();
+                    newNextState = new TeleporterInteraction.ChargedStateAlwaysInteractable();
                     Log.Info("Shrine of Descent: the teleporter stays usable.");
                 }
 

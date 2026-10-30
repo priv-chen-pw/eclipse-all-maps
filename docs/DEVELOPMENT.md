@@ -242,9 +242,10 @@ a boss reward (`TeleporterInteraction.ActivateAccessCodes`), and arms one of thr
 `SolusFight.TriggerSirensCallPortal` (Siren's Call) arms Computational Exchange or Solutional Haunt the
 same way. Each goes through the `PortalSpawner.WillSpawn` setter into `OnWillSpawnUpdated` (MMHOOK has no
 hooks for property setters).
-[AlternatePathPortals.cs](../EclipseAllMaps/AlternatePathPortals.cs) passes false there for Solutional
-Haunt's, and for Conduit Canyon's when Conduit Canyon is switched off (on it is a stage 4 of the rotation).
-The access-code fight and its reward stay. Computational Exchange returns to `Run.nextStageScene`
+[AlternatePathPortals.cs](../EclipseAllMaps/AlternatePathPortals.cs) replaces
+`AccessCodesMissionController.OnStartServer` with its own branch for a run without the Alloyed Collective,
+which switches every node off, so no access-code fight, reward or portal happens. It passes false to
+`OnWillSpawnUpdated` for Solutional Haunt's portal, which Siren's Call still arms. Computational Exchange returns to `Run.nextStageScene`
 (`CompExchangePortal`, `useRunNextStageScene`), and its `SpawnHardwarePortal` has no position set in the
 scene, so it never spawns.
 
@@ -306,8 +307,7 @@ Soulbound Threshold, and the Mainline Portal on Solutional Haunt; exits are foun
   near the same `returnPoint`. The next stage is picked again from Sky Meadow's destinations first, since
   some routes there leave a stage 5 up next (Solutional Haunt's teleporter, Void Locus's signals).
   `doNotIncrementStageNumber` is set: both are `Stage` scenes, and counting them would start the next loop
-  at `stageClearCountInCurrentLoop` 1 (the access codes would then open their Conduit Canyon portal on stage
-  2). Looping straight from stage 5 or from the hidden-realm final stages counts nothing either.
+  at `stageClearCountInCurrentLoop` 1. Looping straight from stage 5 or from the hidden-realm final stages counts nothing either.
 - An end altar (10-18 m from the exit like the loop portal): Solutional Haunt after `SpawnEyePortal.OnEnter` (the
   crashed Solus Wing's post-fight object, which opens the Mainline Portal to Computational Exchange),
   `DecompileEnding`; in Eclipse, Prime Meridian after `RevealRebirthShriine.OnEnter`, `RebirthEndingDef`, and
@@ -362,8 +362,10 @@ which outside Conduit Canyon disables the teleporter and places
 `CursedBookSacrificeZone_TeleporterNextStage_Variant` (Reincarnation on to the next stage). The mod clears
 `OverchargingState.portalSpawnCard` is cleared before
 `OnExit`, and `EntityStateMachine.SetNextState` swaps DLC4's `ChargedState` for
-`TeleporterInteraction.ChargedState`, which it extends, firing its `SurviveMajorCatastrophe` karma event
-itself. That runs on the server, whose networked state machine sends clients the plain state.
+`TeleporterInteraction.ChargedStateAlwaysInteractable`, firing its `SurviveMajorCatastrophe` karma event
+itself. Not the plain `ChargedState`: it is usable only once the private `monstersCleared` is set, which only
+vanilla's `ChargingState.FixedUpdate` does, and DLC4's charging states replace that one, so the teleporter
+stayed shut. That runs on the server, whose networked state machine sends clients the plain state.
 
 To test the final stages, Debug / Start at stage 5 ([DebugStart.cs](../EclipseAllMaps/DebugStart.cs),
 off by default, left out of the README and CHANGELOG): `EclipseStagePool` swaps any stage 1 pool (the run's
